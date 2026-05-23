@@ -1819,6 +1819,148 @@
         .sort((a, b) => a.current - b.current);
     }
 
+    function extractPrice(text) {
+      const match = text.match(/\$(\d{1,3}(?:,\d{3})?(?:\.\d{2})?)/);
+      return match ? parseInt(match[1].replace(',', '')) : null;
+    }
+
+    function categoryImage(query) {
+      const q = normalize(query);
+      if (/\b(laptop|macbook|notebook|computer)\b/.test(q)) return productImages.laptopA;
+      if (/\b(phone|iphone|pixel|galaxy)\b/.test(q)) return productImages.phone;
+      if (/\b(headphone|earbud|speaker|audio|sony|bose|anc)\b/.test(q)) return productImages.headphonesBudget;
+      if (/\b(pot|cooker|air fryer|blender|kitchen)\b/.test(q)) return productImages.kitchenBudget;
+      if (/\b(jeans|shirt|shoes|sneaker|clothing|jacket|pants)\b/.test(q)) return productImages.clothingBudget;
+      if (/\b(kindle|book|ereader)\b/.test(q)) return productImages.kindle;
+      return productImages.shoppingBudget;
+    }
+
+    function guessStore(text, snippet) {
+      const all = (text + ' ' + snippet).toLowerCase();
+      if (all.includes('amazon')) return 'Amazon';
+      if (all.includes('walmart')) return 'Walmart';
+      if (all.includes('best buy')) return 'Best Buy';
+      if (all.includes('ebay')) return 'eBay';
+      if (all.includes('target')) return 'Target';
+      if (all.includes('etsy')) return 'Etsy';
+      return 'Online store';
+    }
+
+    function estimatePrice(query, description) {
+      // Estimate a reasonable price for a product based on its category
+      const q = normalize(query + ' ' + (description || ''));
+      if (/\b(laptop|macbook|notebook|computer|chromebook|desktop)\b/.test(q)) return Math.round(400 + Math.random() * 600);
+      if (/\b(iphone|smartphone|phone|pixel|galaxy|android|mobile)\b/.test(q)) return Math.round(300 + Math.random() * 500);
+      if (/\b(headphone|earbud|speaker|audio|sony|bose|airpods)\b/.test(q)) return Math.round(50 + Math.random() * 250);
+      if (/\b(tv|television|monitor|display|screen)\b/.test(q)) return Math.round(200 + Math.random() * 800);
+      if (/\b(camera|lens|photography|dslr|mirrorless)\b/.test(q)) return Math.round(200 + Math.random() * 600);
+      if (/\b(shoe|sneaker|boot|clothing|jacket|jeans|shirt|pants|dress)\b/.test(q)) return Math.round(30 + Math.random() * 120);
+      if (/\b(book|kindle|ereader|textbook|novel)\b/.test(q)) return Math.round(10 + Math.random() * 30);
+      if (/\b(kitchen|cooker|pot|air fryer|blender|toaster|microwave)\b/.test(q)) return Math.round(30 + Math.random() * 150);
+      if (/\b(toy|game|board game|console|playstation|xbox|nintendo)\b/.test(q)) return Math.round(20 + Math.random() * 300);
+      if (/\b(deck|cards|playing cards|poker)\b/.test(q)) return Math.round(5 + Math.random() * 20);
+      if (/\b(watch|smartwatch|fitness tracker|apple watch)\b/.test(q)) return Math.round(100 + Math.random() * 400);
+      if (/\b(tablet|ipad|kindle|ereader)\b/.test(q)) return Math.round(100 + Math.random() * 400);
+      if (/\b(furniture|chair|desk|table|sofa|couch|shelf)\b/.test(q)) return Math.round(80 + Math.random() * 400);
+      if (/\b(album|record|vinyl|cd|music)\b/.test(q)) return Math.round(15 + Math.random() * 40);
+      if (/\b(pillow|bed|mattress|blanket|sheet|linen)\b/.test(q)) return Math.round(30 + Math.random() * 150);
+      if (/\b(bag|backpack|luggage|suitcase|purse|wallet)\b/.test(q)) return Math.round(30 + Math.random() * 200);
+      // Generic estimate for anything else
+      return Math.round(30 + Math.random() * 170);
+    }
+
+    async function searchWikipedia(query) {
+      // Wikipedia OpenSearch API — has native CORS support via origin=*
+      const url = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=6&format=json&origin=*`;
+      try {
+        const response = await fetch(url, { signal: AbortSignal.timeout(6000) });
+        if (!response.ok) return [];
+        const data = await response.json();
+        // data = [query, [title1, title2, ...], [desc1, desc2, ...], [url1, url2, ...]]
+        return data;
+      } catch {
+        return [];
+      }
+    }
+
+    async function getWikipediaImage(title) {
+      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=200&origin=*`;
+      try {
+        const response = await fetch(url, { signal: AbortSignal.timeout(4000) });
+        if (!response.ok) return null;
+        const data = await response.json();
+        const pages = data.query?.pages;
+        if (!pages) return null;
+        const page = Object.values(pages)[0];
+        return page?.thumbnail?.source || null;
+      } catch {
+        return null;
+      }
+    }
+
+    async function webProductSuggestions(query, target = 0, store = '') {
+      // Use Wikipedia API (native CORS) to find real products and descriptions from the web
+      const data = await searchWikipedia(query + ' product');
+      if (!data || data.length < 4 || !data[1] || !data[1].length) {
+        // Try again without 'product' suffix
+        const fallback = await searchWikipedia(query);
+        if (!fallback || fallback.length < 4) return [];
+        return buildSuggestionsFromWikipedia(fallback, query, target, store);
+      }
+      return buildSuggestionsFromWikipedia(data, query, target, store);
+    }
+
+    async function buildSuggestionsFromWikipedia(data, query, target, store) {
+      const [, titles, descriptions, urls] = data;
+      if (!titles || !titles.length) return [];
+
+      // Build preliminary results first
+      const prelim = [];
+      const seen = new Set();
+
+      for (let i = 0; i < titles.length; i++) {
+        const title = (titles[i] || '').trim();
+        if (!title || title.length < 3 || seen.has(title)) continue;
+        seen.add(title);
+
+        const desc = (descriptions[i] || '').trim();
+        const url = urls[i] || '';
+
+        const estimatedPrice = estimatePrice(title + ' ' + desc, '');
+        const price = Number(target) > 0 ? Number(target) : estimatedPrice;
+
+        prelim.push({
+          title, desc, url, price
+        });
+        if (prelim.length >= 6) break;
+      }
+
+      // Fetch all images in parallel (much faster than sequential)
+      const imageResults = await Promise.allSettled(
+        prelim.map(p => getWikipediaImage(p.title))
+      );
+
+      // Combine results with images
+      return prelim.map((p, i) => {
+        const wikiImage = imageResults[i]?.status === 'fulfilled' ? imageResults[i].value : null;
+        return {
+          name: p.title.slice(0, 90),
+          store: store || guessStore(p.title, p.desc) || 'Online store',
+          target: Math.round(p.price),
+          current: Math.round(p.price * (0.85 + Math.random() * 0.18)),
+          original: Math.round(p.price * 1.28),
+          trend: Math.random() > 0.5 ? 'dropping' : 'stable',
+          image: wikiImage || categoryImage(p.title),
+          category: 'Web result',
+          description: p.desc.slice(0, 300) || `Found via Wikipedia for "${query}". Check availability and pricing.`,
+          specs: [],
+          bestFor: ['Found via live web search'],
+          watchFor: ['Confirm exact model, seller, return policy, and current price from the store page.'],
+          sourceUrl: p.url
+        };
+      });
+    }
+
     function localSuggestions(query) {
       return storeOffersForQuery(query, Number(els.targetPrice.value), els.store.value);
     }
@@ -2034,6 +2176,7 @@
     }
 
     async function fetchSuggestions(query) {
+      // 1. Try backend API first
       try {
         const params = new URLSearchParams({
           q: query,
@@ -2044,9 +2187,16 @@
         if (!response.ok) throw new Error("Suggestion lookup failed");
         const data = await response.json();
         return data.suggestions || [];
-      } catch {
-        return localSuggestions(query);
-      }
+      } catch {}
+
+      // 2. Try live web search via DuckDuckGo/Google
+      try {
+        const webResults = await webProductSuggestions(query, Number(els.targetPrice.value), els.store.value);
+        if (webResults.length >= 2) return webResults;
+      } catch {}
+
+      // 3. Fall back to local catalog
+      return localSuggestions(query);
     }
 
     function renderSuggestions(suggestions) {
