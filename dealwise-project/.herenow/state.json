@@ -1,0 +1,46 @@
+{
+  "publishes": {
+    "plucky-quail-72ba": {
+      "siteUrl": "https://plucky-quail-72ba.here.now/"
+    },
+    "topaz-violet-9cfv": {
+      "siteUrl": "https://topaz-violet-9cfv.here.now/"
+    },
+    "present-entry-ywhf": {
+      "siteUrl": "https://present-entry-ywhf.here.now/",
+      "claimToken": "cca7c082c8d7d6aee19bec8b78b07e0a19717214f32d45f0dea67631d54c925d",
+      "claimUrl": "https://here.now/claim?slug=present-entry-ywhf&token=cca7c082c8d7d6aee19bec8b78b07e0a19717214f32d45f0dea67631d54c925d",
+      "expiresAt": "2026-05-14T00:16:57.649Z"
+    },
+    "emerald-ravine-dgjy": {
+      "siteUrl": "https://emerald-ravine-dgjy.here.now/",
+      "claimToken": "33c7b41d212a33dd854e7ab29a16d6762007fbf3c7645c99e0572c5f646c6332",
+      "claimUrl": "https://here.now/claim?slug=emerald-ravine-dgjy&token=33c7b41d212a33dd854e7ab29a16d6762007fbf3c7645c99e0572c5f646c6332",
+      "expiresAt": "2026-05-14T01:47:46.773Z"
+    },
+    "quiet-steeple-vq7j": {
+      "siteUrl": "https://quiet-steeple-vq7j.here.now/",
+      "claimToken": "46dc2ca032922ff6eaf20689edcbef96c85245e627c9bc6ca311319a9af5fc9f",
+      "claimUrl": "https://here.now/claim?slug=quiet-steeple-vq7j&token=46dc2ca032922ff6eaf20689edcbef96c85245e627c9bc6ca311319a9af5fc9f",
+      "expiresAt": "2026-05-14T01:52:36.660Z"
+    },
+    "ivory-quarry-thsp": {
+      "siteUrl": "https://ivory-quarry-thsp.here.now/",
+      "claimToken": "ecf189ec64333289a0da50d66225e1341df4115190462cf3af3cba0c2569be64",
+      "claimUrl": "https://here.now/claim?slug=ivory-quarry-thsp&token=ecf189ec64333289a0da50d66225e1341df4115190462cf3af3cba0c2569be64",
+      "expiresAt": "2026-05-14T01:54:08.090Z"
+    },
+    "astral-inlet-5e7p": {
+      "siteUrl": "https://astral-inlet-5e7p.here.now/",
+      "claimToken": "bad2fb376701a32da82491d01fce51b1550cf01ed90f8e25e4bc71c3b2344f30",
+      "claimUrl": "https://here.now/claim?slug=astral-inlet-5e7p&token=bad2fb376701a32da82491d01fce51b1550cf01ed90f8e25e4bc71c3b2344f30",
+      "expiresAt": "2026-05-14T01:59:23.673Z"
+    },
+    "humble-vessel-gsn2": {
+      "siteUrl": "https://humble-vessel-gsn2.here.now/",
+      "claimToken": "9a5749df78647ad5a990ceb6a8eceab77160c0d90d5c134745bfc554670e1133",
+      "claimUrl": "https://here.now/claim?slug=humble-vessel-gsn2&token=9a5749df78647ad5a990ceb6a8eceab77160c0d90d5c134745bfc554670e1133",
+      "expiresAt": "2026-05-24T21:26:54.550Z"
+    }
+  }
+}

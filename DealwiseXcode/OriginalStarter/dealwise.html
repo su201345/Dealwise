@@ -1,0 +1,2697 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dealwise</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F7F5F0;
+      --card: #FFFFFF;
+      --border: #E2DDD5;
+      --text: #1F261F;
+      --muted: #706A60;
+      --muted-2: #9A9388;
+      --green: #1A472A;
+      --green-soft: #E7F0E5;
+      --amber: #C58618;
+      --amber-soft: #FFF3D8;
+      --blue: #2F6FA8;
+      --blue-soft: #E7F0F8;
+      --red: #A64636;
+      --shadow: 0 22px 60px rgba(52, 45, 34, 0.12);
+      --soft-shadow: 0 12px 32px rgba(52, 45, 34, 0.08);
+      --radius: 16px;
+      --ease: 0.18s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(135deg, rgba(26, 71, 42, 0.045), transparent 36%),
+        linear-gradient(315deg, rgba(47, 111, 168, 0.04), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    ::selection {
+      background: rgba(26, 71, 42, 0.16);
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #EFEAE2;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #CFC7BA;
+      border: 2px solid #EFEAE2;
+      border-radius: 999px;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      padding-bottom: 48px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(226, 221, 213, 0.78);
+      background: rgba(247, 245, 240, 0.78);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .nav-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 74px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: clamp(1.9rem, 4vw, 2.55rem);
+      line-height: 1;
+      color: var(--green);
+      white-space: nowrap;
+    }
+
+    .beta {
+      border: 1px solid rgba(26, 71, 42, 0.22);
+      background: rgba(26, 71, 42, 0.08);
+      color: var(--green);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px;
+      max-width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 7px 22px rgba(54, 45, 34, 0.05);
+    }
+
+    .tab-btn {
+      position: relative;
+      min-width: 108px;
+      border-radius: 999px;
+      padding: 10px 18px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      transition: color var(--ease), background var(--ease), box-shadow var(--ease), transform var(--ease);
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      background: var(--green);
+      color: white;
+      box-shadow: 0 10px 24px rgba(26, 71, 42, 0.2);
+    }
+
+    .savings-total {
+      justify-self: end;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .savings-total strong {
+      font-family: "DM Serif Display", Georgia, serif;
+      color: var(--green);
+      font-size: 1.75rem;
+      line-height: 1;
+      font-weight: 400;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding-top: 52px;
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+      animation: fadeUp 0.28s ease both;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-header {
+      max-width: 760px;
+      margin-bottom: 30px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--green);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    .display-number {
+      font-family: "DM Serif Display", Georgia, serif;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 5.4vw, 4.8rem);
+      line-height: 1;
+      color: #18201A;
+    }
+
+    .subtitle {
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.8vw, 1.18rem);
+      line-height: 1.65;
+      max-width: 710px;
+    }
+
+    .section-label {
+      margin: 36px 0 14px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .metric-card,
+    .card,
+    .coupon-card,
+    .settings-card,
+    .alert-card {
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: var(--radius);
+    }
+
+    .metric-card {
+      position: relative;
+      overflow: hidden;
+      padding: 22px;
+      min-height: 136px;
+      transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+    }
+
+    .metric-card:hover,
+    .item-card:hover,
+    .coupon-card:hover,
+    .alert-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--soft-shadow);
+      border-color: #D5CEC3;
+    }
+
+    .metric-card::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 5px;
+      background: var(--accent);
+    }
+
+    .metric-label {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      margin-top: 10px;
+      font-size: clamp(2.55rem, 5vw, 4.2rem);
+      line-height: 0.95;
+    }
+
+    .metric-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .add-card {
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .add-form {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) 160px 180px auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #FFFEFC;
+      color: var(--text);
+      padding: 0 13px;
+      outline: none;
+      transition: border-color var(--ease), box-shadow var(--ease), background var(--ease);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: rgba(26, 71, 42, 0.54);
+      box-shadow: 0 0 0 4px rgba(26, 71, 42, 0.11);
+      background: white;
+    }
+
+    .field.invalid input,
+    .field.invalid select {
+      border-color: var(--red);
+      box-shadow: 0 0 0 4px rgba(166, 70, 54, 0.1);
+    }
+
+    .field-error {
+      min-height: 16px;
+      color: var(--red);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .primary-btn {
+      min-height: 48px;
+      border-radius: 12px;
+      padding: 0 18px;
+      background: var(--green);
+      color: white;
+      font-weight: 800;
+      transition: transform var(--ease), box-shadow var(--ease), background var(--ease);
+      white-space: nowrap;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(26, 71, 42, 0.2);
+      background: #123820;
+    }
+
+    .watchlist {
+      display: grid;
+      gap: 14px;
+    }
+
+    .item-card {
+      display: grid;
+      grid-template-columns: 86px minmax(0, 1.25fr) minmax(180px, 0.95fr) auto;
+      gap: 18px;
+      align-items: center;
+      padding: 18px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: var(--radius);
+      animation: itemIn 0.32s ease both;
+      transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+    }
+
+    @keyframes itemIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .product-media {
+      width: 86px;
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+
+    .product-media img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 14px rgba(31, 38, 31, 0.1));
+      transition: transform var(--ease), filter var(--ease);
+    }
+
+    .item-card:hover .product-media img {
+      transform: scale(1.035);
+      filter: drop-shadow(0 12px 18px rgba(31, 38, 31, 0.15));
+    }
+
+    .product-fallback {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--green);
+      font-weight: 800;
+      background: white;
+    }
+
+    .item-main {
+      min-width: 0;
+    }
+
+    .item-title {
+      margin: 0;
+      font-family: "DM Sans", sans-serif;
+      font-size: 1.08rem;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .meta-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 13px;
+    }
+
+    .badge,
+    .trend-pill,
+    .discount {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .badge.buy {
+      background: var(--green);
+      color: white;
+    }
+
+    .badge.almost {
+      background: var(--amber-soft);
+      color: #7B520D;
+    }
+
+    .badge.watch {
+      background: var(--blue-soft);
+      color: #214F78;
+    }
+
+    .trend-pill {
+      background: #F4F0EA;
+      color: var(--muted);
+    }
+
+    .progress-wrap {
+      min-width: 0;
+    }
+
+    .progress-copy {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .progress-track {
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #EFEAE2;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--green);
+      transition: width var(--ease);
+    }
+
+    .price-block {
+      text-align: right;
+      min-width: 128px;
+    }
+
+    .current-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .price {
+      font-size: 2.45rem;
+      line-height: 0.95;
+      color: #18201A;
+    }
+
+    .discount {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .was-price {
+      margin-top: 8px;
+      color: var(--muted-2);
+      text-decoration: line-through;
+      font-weight: 700;
+    }
+
+    .actions {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #FFFEFC;
+      color: var(--text);
+      font-size: 1.05rem;
+      font-weight: 800;
+      transition: transform var(--ease), box-shadow var(--ease), background var(--ease), border-color var(--ease), color var(--ease);
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(52, 45, 34, 0.1);
+      border-color: #D0C7BA;
+      background: white;
+    }
+
+    .icon-btn.remove:hover {
+      color: var(--red);
+    }
+
+    .icon-btn.remove.confirming {
+      width: 68px;
+      color: white;
+      background: var(--red);
+      border-color: var(--red);
+      font-size: 0.88rem;
+    }
+
+    .item-card {
+      cursor: pointer;
+    }
+
+    .item-card:focus-within {
+      border-color: rgba(26, 71, 42, 0.42);
+      box-shadow: 0 0 0 4px rgba(26, 71, 42, 0.1);
+    }
+
+    .empty-state {
+      display: none;
+      padding: 44px 20px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed #D7D0C5;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.56);
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+
+    .suggestions {
+      display: none;
+      margin-top: 14px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+
+    .suggestions.show {
+      display: block;
+    }
+
+    .suggestion-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .suggestion-header strong {
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .suggestion-header span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .suggestion-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .suggestion-btn {
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      min-height: 58px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #FFFEFC;
+      padding: 10px 12px;
+      text-align: left;
+      transition: border-color var(--ease), box-shadow var(--ease), transform var(--ease);
+    }
+
+    .suggestion-btn:hover {
+      border-color: rgba(26, 71, 42, 0.38);
+      box-shadow: 0 10px 22px rgba(52, 45, 34, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .suggestion-btn strong,
+    .suggestion-btn span {
+      display: block;
+    }
+
+    .suggestion-btn strong {
+      color: var(--text);
+      font-size: 0.96rem;
+      line-height: 1.2;
+    }
+
+    .suggestion-btn span {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .suggestion-thumb {
+      width: 52px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .suggestion-thumb img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 10px rgba(31, 38, 31, 0.1));
+    }
+
+    .coupon-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .coupon-card {
+      position: relative;
+      overflow: hidden;
+      padding: 22px;
+      border-left: 7px solid var(--accent);
+      transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+    }
+
+    .coupon-store {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .coupon-desc {
+      margin: 0;
+      min-height: 58px;
+      font-size: 1.45rem;
+      line-height: 1.12;
+      font-weight: 800;
+    }
+
+    .coupon-expiry {
+      margin: 14px 0 18px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .code-row {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .code-box {
+      flex: 1;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed #BEB5A7;
+      border-radius: 12px;
+      background: #FBF8F2;
+      color: var(--text);
+      font-family: "DM Mono", monospace;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      transition: border-color var(--ease), background var(--ease), transform var(--ease);
+    }
+
+    .code-box:hover {
+      border-color: var(--green);
+      background: #F7FBF5;
+      transform: translateY(-1px);
+    }
+
+    .copy-btn {
+      min-height: 44px;
+      border-radius: 12px;
+      padding: 0 14px;
+      background: #F0EBE3;
+      color: var(--text);
+      font-weight: 800;
+      transition: background var(--ease), transform var(--ease);
+    }
+
+    .copy-btn:hover {
+      background: #E7E0D5;
+      transform: translateY(-1px);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .alerts-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .feed {
+      display: grid;
+      gap: 12px;
+    }
+
+    .alert-card {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent), transparent 82%);
+    }
+
+    .alert-title {
+      margin: 0;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .alert-subtitle,
+    .alert-time {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .alert-time {
+      margin: 0;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .settings-card {
+      padding: 20px;
+    }
+
+    .settings-title {
+      margin: 0 0 16px;
+      font-family: "DM Sans", sans-serif;
+      font-size: 1.04rem;
+      font-weight: 800;
+    }
+
+    .setting {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .setting:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .setting-copy strong {
+      display: block;
+      font-size: 0.98rem;
+    }
+
+    .setting-copy span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .switch {
+      position: relative;
+      flex: 0 0 auto;
+      width: 52px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: #D7D0C5;
+      transition: background var(--ease), box-shadow var(--ease);
+    }
+
+    .slider::after {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 2px 8px rgba(52, 45, 34, 0.18);
+      transition: transform var(--ease);
+    }
+
+    .switch input:checked + .slider {
+      background: var(--green);
+    }
+
+    .switch input:focus + .slider {
+      box-shadow: 0 0 0 4px rgba(26, 71, 42, 0.12);
+    }
+
+    .switch input:checked + .slider::after {
+      transform: translateX(22px);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 40;
+      transform: translate(-50%, 20px);
+      opacity: 0;
+      pointer-events: none;
+      max-width: calc(100% - 32px);
+      border-radius: 999px;
+      background: #18201A;
+      color: white;
+      padding: 13px 18px;
+      box-shadow: var(--shadow);
+      font-weight: 800;
+      transition: opacity var(--ease), transform var(--ease);
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 35;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(31, 38, 31, 0.34);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .detail-modal {
+      width: min(760px, 100%);
+      max-height: min(760px, calc(100vh - 36px));
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .detail-head {
+      display: grid;
+      grid-template-columns: 104px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: start;
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-head .product-media {
+      width: 104px;
+      height: 92px;
+    }
+
+    .detail-title {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+      line-height: 1;
+    }
+
+    .detail-body {
+      display: grid;
+      gap: 18px;
+      padding: 20px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .detail-stat {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #FFFEFC;
+    }
+
+    .detail-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .detail-stat strong {
+      display: block;
+      margin-top: 6px;
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: 1.55rem;
+      font-weight: 400;
+    }
+
+    .detail-section h3 {
+      margin: 0 0 8px;
+      font-family: "DM Sans", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .detail-section p,
+    .detail-section li {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .detail-section ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .dealbot {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 34;
+      width: min(380px, calc(100% - 28px));
+    }
+
+    .dealbot-toggle {
+      float: right;
+      min-height: 52px;
+      border-radius: 999px;
+      padding: 0 18px;
+      background: var(--green);
+      color: white;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+      transition: transform var(--ease), background var(--ease);
+    }
+
+    .dealbot-toggle:hover {
+      transform: translateY(-2px);
+      background: #123820;
+    }
+
+    .dealbot-panel {
+      display: none;
+      clear: both;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .dealbot.open .dealbot-panel {
+      display: block;
+      animation: fadeUp 0.2s ease both;
+    }
+
+    .dealbot.open .dealbot-toggle {
+      display: none;
+    }
+
+    .dealbot-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 14px 12px;
+      border-bottom: 1px solid var(--border);
+      background: #FBF8F2;
+    }
+
+    .dealbot-head strong {
+      display: block;
+      color: var(--green);
+      font-size: 1.05rem;
+    }
+
+    .dealbot-head span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .dealbot-log {
+      display: grid;
+      gap: 9px;
+      max-height: 300px;
+      overflow: auto;
+      padding: 14px;
+      background: #FFFEFC;
+    }
+
+    .chat-msg {
+      width: fit-content;
+      max-width: 92%;
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: var(--text);
+      background: #F0EBE3;
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+
+    .chat-msg.user {
+      justify-self: end;
+      background: var(--green);
+      color: white;
+    }
+
+    .dealbot-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .dealbot-form input {
+      min-height: 42px;
+    }
+
+    .dealbot-form button {
+      min-height: 42px;
+      border-radius: 12px;
+      padding: 0 14px;
+      background: var(--green);
+      color: white;
+      font-weight: 800;
+    }
+
+    @media (max-width: 980px) {
+      .nav-inner {
+        grid-template-columns: 1fr;
+        justify-items: stretch;
+        padding: 14px 0;
+      }
+
+      .tabs {
+        justify-content: center;
+        overflow-x: auto;
+      }
+
+      .savings-total {
+        justify-self: start;
+      }
+
+      main {
+        padding-top: 34px;
+      }
+
+      .metrics,
+      .coupon-grid,
+      .alerts-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .add-form {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .primary-btn {
+        grid-column: span 2;
+      }
+
+      .item-card {
+        grid-template-columns: 78px minmax(0, 1fr);
+      }
+
+      .progress-wrap,
+      .price-block,
+      .actions {
+        grid-column: 1 / -1;
+      }
+
+      .price-block {
+        text-align: left;
+      }
+
+      .current-row {
+        justify-content: flex-start;
+      }
+
+      .actions {
+        grid-template-columns: repeat(2, 42px);
+        justify-content: start;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .app-shell {
+        padding-bottom: 30px;
+      }
+
+      .nav-inner,
+      main {
+        width: min(100% - 22px, 1180px);
+      }
+
+      .brand {
+        justify-content: space-between;
+      }
+
+      .tabs {
+        justify-content: flex-start;
+      }
+
+      .tab-btn {
+        min-width: 0;
+        flex: 1 1 0;
+        padding-inline: 10px;
+      }
+
+      h1 {
+        font-size: clamp(2.65rem, 15vw, 4.2rem);
+      }
+
+      .add-form {
+        grid-template-columns: 1fr;
+      }
+
+      .primary-btn {
+        grid-column: auto;
+      }
+
+      .item-card {
+        grid-template-columns: 68px minmax(0, 1fr);
+        gap: 13px;
+        padding: 14px;
+      }
+
+      .product-media {
+        width: 68px;
+        height: 58px;
+      }
+
+      .alert-time {
+        grid-column: 2;
+      }
+
+      .code-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .copy-btn,
+      .code-box {
+        width: 100%;
+      }
+
+      .suggestion-list,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-head {
+        grid-template-columns: 82px minmax(0, 1fr);
+      }
+
+      .detail-head .product-media {
+        width: 82px;
+        height: 72px;
+      }
+
+      .detail-head .icon-btn {
+        grid-column: 1 / -1;
+        justify-self: end;
+      }
+
+      .dealbot {
+        right: 14px;
+        bottom: 14px;
+      }
+
+      .toast {
+        white-space: normal;
+        text-align: center;
+      }
+    }
+
+
+    .deal-engine-card {
+      margin: 22px 0;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .engine-panel,
+    .cart-panel {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(18, 31, 46, 0.08);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 18px 50px rgba(18, 31, 46, 0.08);
+    }
+
+    .engine-title {
+      font-size: 1rem;
+      margin: 0 0 6px;
+      color: var(--ink);
+    }
+
+    .engine-copy {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: .94rem;
+    }
+
+    .engine-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .secondary-btn {
+      border: 1px solid rgba(18, 31, 46, 0.12);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 11px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(18, 31, 46, 0.08);
+    }
+
+    .secondary-btn:disabled {
+      opacity: .55;
+      cursor: wait;
+    }
+
+    .engine-status {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .cart-result {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .cart-result strong {
+      color: var(--ink);
+    }
+
+    .safe-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(30, 132, 73, .1);
+      color: #19673a;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: .82rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .coupon-match {
+      font-size: .78rem;
+      color: #19673a;
+      background: rgba(30, 132, 73, .09);
+      padding: 5px 8px;
+      border-radius: 999px;
+      display: inline-flex;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 800px) {
+      .deal-engine-card { grid-template-columns: 1fr; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <nav class="topbar" aria-label="Primary">
+      <div class="nav-inner">
+        <div class="brand" aria-label="Dealwise">
+          <div class="brand-mark">Dealwise</div>
+          <span class="beta">BETA</span>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Dealwise sections">
+          <button class="tab-btn active" id="tab-watchlist" type="button" role="tab" aria-selected="true" aria-controls="watchlist" data-tab="watchlist">Watchlist</button>
+          <button class="tab-btn" id="tab-coupons" type="button" role="tab" aria-selected="false" aria-controls="coupons" data-tab="coupons">Coupons</button>
+          <button class="tab-btn" id="tab-alerts" type="button" role="tab" aria-selected="false" aria-controls="alerts" data-tab="alerts">Alerts</button>
+        </div>
+
+        <div class="savings-total" aria-live="polite">
+          <strong id="navSavings">$0</strong>
+          <span>saved</span>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <section id="watchlist" class="panel active" role="tabpanel" aria-labelledby="tab-watchlist">
+        <header class="page-header">
+          <p class="eyebrow">Smart deal tracking</p>
+          <h1>Your wishlist, price-checked.</h1>
+          <p class="subtitle">Track the products you want, compare today&apos;s price to your personal buy point, and let Dealwise surface the moments when waiting turns into saving.</p>
+        </header>
+
+        <div class="metrics" aria-live="polite">
+          <article class="metric-card" style="--accent: var(--green);">
+            <p class="metric-label">Items tracked</p>
+            <div class="metric-value display-number" id="itemsTracked">0</div>
+            <div class="metric-note">Across your online wishlist</div>
+          </article>
+          <article class="metric-card" style="--accent: var(--amber);">
+            <p class="metric-label">Total savings</p>
+            <div class="metric-value display-number" id="totalSavings">$0</div>
+            <div class="metric-note">Compared with original prices</div>
+          </article>
+          <article class="metric-card" style="--accent: var(--blue);">
+            <p class="metric-label">Ready to buy</p>
+            <div class="metric-value display-number" id="readyCount">0</div>
+            <div class="metric-note">At or below your target</div>
+          </article>
+        </div>
+
+        <p class="section-label">Add item</p>
+        <section class="card add-card" aria-label="Add item">
+          <form class="add-form" id="addForm" novalidate>
+            <label class="field" id="itemNameField">
+              Item name
+              <input id="itemName" name="itemName" type="text" placeholder="Air fryer, running shoes..." autocomplete="off" aria-describedby="itemNameError" aria-invalid="false">
+              <span class="field-error" id="itemNameError" aria-live="polite"></span>
+            </label>
+            <label class="field" id="targetPriceField">
+              Target price
+              <input id="targetPrice" name="targetPrice" type="number" min="1" step="1" placeholder="120" aria-describedby="targetPriceError" aria-invalid="false">
+              <span class="field-error" id="targetPriceError" aria-live="polite"></span>
+            </label>
+            <label class="field">
+              Store optional
+              <select id="store" name="store">
+                <option value="">No store preference</option>
+                <option>Amazon</option>
+                <option>Target</option>
+                <option>Best Buy</option>
+                <option>Walmart</option>
+                <option>eBay</option>
+                <option>Other</option>
+              </select>
+            </label>
+            <button class="primary-btn" type="submit">Track it</button>
+          </form>
+          <div class="suggestions" id="suggestions" aria-live="polite">
+            <div class="suggestion-header">
+              <strong>Possible matches</strong>
+              <span>Choose one or keep your typed item</span>
+            </div>
+            <div class="suggestion-list" id="suggestionList"></div>
+          </div>
+        </section>
+
+        <section class="deal-engine-card" aria-label="Safe deal engine">
+          <article class="engine-panel">
+            <span class="safe-pill">✓ Safe sources only</span>
+            <h2 class="engine-title">Refresh prices and coupons for every tracked item</h2>
+            <p class="engine-copy">Dealwise checks configured legal sources such as official merchant APIs, affiliate feeds, public deal APIs, and merchant-approved coupon feeds. It will not bypass logins, scrape protected checkout pages, or use unsafe coupon behavior.</p>
+            <div class="engine-actions">
+              <button class="secondary-btn" id="refreshDeals" type="button">Refresh safe web deals</button>
+              <span class="engine-status" id="engineStatus">Ready to check your watchlist.</span>
+            </div>
+          </article>
+          <article class="cart-panel">
+            <h2 class="engine-title">Cheapest safe cart</h2>
+            <p class="engine-copy">The optimizer applies matching coupons to tracked items and recommends the lowest safe checkout path.</p>
+            <div class="cart-result" id="cartResult"></div>
+          </article>
+        </section>
+
+
+        <p class="section-label">Tracked items</p>
+        <section class="watchlist" id="watchlistItems" aria-live="polite"></section>
+        <div class="empty-state" id="emptyState">
+          <strong>No tracked items yet</strong>
+          Add a product above and Dealwise will start watching the price.
+        </div>
+      </section>
+
+      <section id="coupons" class="panel" role="tabpanel" aria-labelledby="tab-coupons">
+        <header class="page-header">
+          <p class="eyebrow">Coupon vault</p>
+          <h1>Codes worth trying first.</h1>
+          <p class="subtitle">A clean stack of currently available promo codes for the stores already showing up in your shopping orbit.</p>
+        </header>
+
+        <div class="coupon-grid" id="couponGrid" aria-label="Available coupons"></div>
+      </section>
+
+      <section id="alerts" class="panel" role="tabpanel" aria-labelledby="tab-alerts">
+        <header class="page-header">
+          <p class="eyebrow">Alerts</p>
+          <h1>Signals, not noise.</h1>
+          <p class="subtitle">See the price moves, coupon drops, and buy-window moments that matter for your watchlist.</p>
+        </header>
+
+        <div class="alerts-layout">
+          <section>
+            <p class="section-label">Recent events</p>
+            <div class="feed" id="alertFeed"></div>
+          </section>
+
+          <section>
+            <p class="section-label">Notification settings</p>
+            <article class="settings-card">
+              <h2 class="settings-title">Delivery preferences</h2>
+              <div class="setting">
+                <div class="setting-copy">
+                  <strong>Price drop alerts</strong>
+                  <span>Notify when tracked prices move down.</span>
+                </div>
+                <label class="switch" aria-label="Price drop alerts">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting">
+                <div class="setting-copy">
+                  <strong>Target price reached</strong>
+                  <span>Ping when an item reaches your buy point.</span>
+                </div>
+                <label class="switch" aria-label="Target price reached">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting">
+                <div class="setting-copy">
+                  <strong>New coupons</strong>
+                  <span>Surface new codes for tracked stores.</span>
+                </div>
+                <label class="switch" aria-label="New coupons">
+                  <input type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting">
+                <div class="setting-copy">
+                  <strong>Weekly price digest</strong>
+                  <span>Send a concise savings recap.</span>
+                </div>
+                <label class="switch" aria-label="Weekly price digest">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </article>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="detailBackdrop" aria-hidden="true">
+    <article class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <header class="detail-head">
+        <div class="product-media" id="detailMedia" aria-hidden="true"></div>
+        <div>
+          <h2 class="detail-title" id="detailTitle">Product details</h2>
+          <p class="meta-line" id="detailMeta"></p>
+        </div>
+        <button class="icon-btn" type="button" id="detailClose" aria-label="Close product details">×</button>
+      </header>
+      <div class="detail-body" id="detailBody"></div>
+    </article>
+  </div>
+
+  <section class="dealbot" id="dealbot" aria-label="Dealbot assistant">
+    <button class="dealbot-toggle" id="dealbotToggle" type="button">Ask Dealbot</button>
+    <div class="dealbot-panel">
+      <div class="dealbot-head">
+        <div>
+          <strong>Dealbot</strong>
+          <span id="dealbotCredits">200 credits left</span>
+        </div>
+        <button class="icon-btn" id="dealbotClose" type="button" aria-label="Close Dealbot">×</button>
+      </div>
+      <div class="dealbot-log" id="dealbotLog" aria-live="polite">
+        <div class="chat-msg">Ask me about a tracked product, specs, timing, coupons, or missing details. I will save useful facts back into this session&apos;s product database.</div>
+      </div>
+      <form class="dealbot-form" id="dealbotForm">
+        <input id="dealbotInput" type="text" placeholder="Ask about any product..." autocomplete="off" aria-label="Ask Dealbot">
+        <button type="submit">Ask</button>
+      </form>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="sr-only" id="srLive" aria-live="polite"></div>
+
+  <script>
+    const productImages = {
+      sony: "https://www.sony.com/image/1faff1a8d2f9b518cb2ef53f2c1d5af3?fmt=png-alpha&wid=960",
+      instantPot: "https://commons.wikimedia.org/wiki/Special:FilePath/Instant%20Pot%20%2849907000991%29.jpg?width=900",
+      kindle: "https://commons.wikimedia.org/wiki/Special:FilePath/2023%20Amazon%20Kindle%20Paperwhite%20%283%29.jpg?width=900",
+      levis: "https://commons.wikimedia.org/wiki/Special:FilePath/Levis%20501%20rear%20detail.jpg?width=900",
+      laptopA: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80",
+      laptopB: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80",
+      laptopC: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80",
+      laptopD: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=800&auto=format&fit=crop&q=80",
+      phone: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
+      headphonesBudget: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80",
+      kitchenBudget: "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&auto=format&fit=crop&q=80",
+      clothingBudget: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop&q=80",
+      shoppingBudget: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&auto=format&fit=crop&q=80"
+    };
+
+    const budgetCatalog = {
+      laptop: [
+        { name: "Acer Aspire 5 Slim", store: "Amazon", target: 420, current: 349, original: 499, image: productImages.laptopA, category: "Budget laptop", description: "A practical Windows laptop option for school, browsing, documents, and everyday work.", specs: ["15-inch class display", "Everyday productivity", "Lower-cost Windows option"], bestFor: ["Students", "Basic work", "Budget replacement"], watchFor: ["Confirm RAM and storage before buying", "Check processor generation"] },
+        { name: "Lenovo IdeaPad Slim 3", store: "Best Buy", target: 450, current: 379, original: 529, image: productImages.laptopB, category: "Budget laptop", description: "A value-focused laptop line often discounted for everyday home and school use.", specs: ["Portable chassis", "Everyday keyboard", "Frequent sale pricing"], bestFor: ["Home office", "School", "Streaming"], watchFor: ["Avoid low-memory configurations", "Check display brightness"] },
+        { name: "ASUS Vivobook 15", store: "Walmart", target: 430, current: 399, original: 549, image: productImages.laptopC, category: "Budget laptop", description: "A common budget-friendly notebook family with a large screen and mainstream specs.", specs: ["15-inch class display", "Windows laptop", "Often available under $450"], bestFor: ["Large-screen browsing", "Documents", "Video calls"], watchFor: ["Compare CPU and RAM between listings"] },
+        { name: "Refurbished MacBook Air M1", store: "eBay", target: 650, current: 579, original: 799, image: productImages.laptopD, category: "Budget Mac option", description: "A lower-cost way to stay in the Mac ecosystem if you are comfortable buying refurbished.", specs: ["Apple silicon", "Lightweight body", "Long battery life"], bestFor: ["Mac users", "Battery life", "Portable work"], watchFor: ["Verify battery health", "Buy from a reputable refurbisher"] }
+      ],
+      default: [
+        { name: "Budget-friendly starter option", store: "Amazon", target: 80, current: 59, original: 99, image: productImages.shoppingBudget, category: "Budget pick", description: "The lowest-cost option Dealwise found for comparison shopping.", specs: ["Low price", "Basic feature set", "Good first comparison"], bestFor: ["Saving money", "Trying the category"], watchFor: ["Verify exact specs and seller"] },
+        { name: "Best value midrange option", store: "Target", target: 120, current: 89, original: 139, image: productImages.shoppingBudget, category: "Value pick", description: "A balanced option with better expected quality than the cheapest listing.", specs: ["Midrange price", "Better feature mix", "Broad availability"], bestFor: ["Most buyers", "Balanced value"], watchFor: ["Compare warranty and returns"] },
+        { name: "Open-box deal option", store: "Best Buy", target: 150, current: 109, original: 179, image: productImages.shoppingBudget, category: "Open-box value", description: "A budget option to consider if open-box condition is acceptable.", specs: ["Discounted condition", "Return-window dependent", "Potential high value"], bestFor: ["Deal hunters", "Flexible buyers"], watchFor: ["Inspect condition and warranty"] },
+        { name: "Refurbished budget option", store: "eBay", target: 140, current: 99, original: 169, image: productImages.shoppingBudget, category: "Refurbished pick", description: "A lower-price option where seller ratings matter more.", specs: ["Refurbished", "Lower price", "Seller-dependent"], bestFor: ["Maximum savings", "Non-urgent purchases"], watchFor: ["Only buy from highly rated sellers"] }
+      ]
+    };
+
+    budgetCatalog.phone = [
+      { name: "Requested phone offer", store: "Amazon", target: 900, current: 829, original: 999, image: productImages.phone, category: "Phone offer", description: "A store offer for the exact phone you searched.", specs: ["Smartphone", "Store offer", "Compare final checkout price"], bestFor: ["Phone deal tracking"], watchFor: ["Confirm storage, carrier lock, condition, and return policy"] }
+    ];
+
+    const reviewKnowledge = {
+      "sony wh 1000xm5 headphones": {
+        summary: "Review consensus is very strong: reviewers consistently praise noise canceling, sound quality, comfort, and battery life.",
+        ratings: [
+          "Tom's Guide: 4.5/5.",
+          "What Hi-Fi?: 5/5.",
+          "Digital Trends: Editors' Choice.",
+          "RTINGS: detailed lab-tested review with strong commute/travel performance."
+        ],
+        complaints: ["They do not fold.", "No aptX support.", "Some users mention heat or fit over long sessions.", "ANC expectations vary in some user reviews."]
+      }
+    };
+
+    const items = [
+      {
+        id: 1,
+        name: "Sony WH-1000XM5 Headphones",
+        target: 280,
+        current: 279,
+        original: 349,
+        store: "Amazon",
+        trend: "dropping",
+        image: productImages.sony
+      },
+      {
+        id: 2,
+        name: "Instant Pot Duo 7-in-1",
+        target: 70,
+        current: 89,
+        original: 99,
+        store: "Target",
+        trend: "dropping",
+        image: productImages.instantPot
+      },
+      {
+        id: 3,
+        name: "Kindle Paperwhite",
+        target: 100,
+        current: 109,
+        original: 139,
+        store: "Amazon",
+        trend: "stable",
+        image: productImages.kindle
+      },
+      {
+        id: 4,
+        name: "Levi's 501 Jeans",
+        target: 55,
+        current: 48,
+        original: 79,
+        store: "Levi's",
+        trend: "low",
+        image: productImages.levis
+      }
+    ];
+
+    const productDetails = {
+      "Sony WH-1000XM5 Headphones": {
+        category: "Wireless noise-canceling headphones",
+        image: productImages.sony,
+        description: "Premium over-ear Bluetooth headphones with strong active noise cancellation, long battery life, multipoint pairing, and lightweight comfort.",
+        specs: ["Active noise cancellation", "Up to 30 hours battery life", "Bluetooth multipoint", "USB-C quick charge", "Touch controls"],
+        bestFor: ["Travel", "Open offices", "Long listening sessions"],
+        watchFor: ["No folding hinges", "Often discounted during major retail events"],
+        learnedFacts: []
+      },
+      "Instant Pot Duo 7-in-1": {
+        category: "Multi-cooker",
+        image: productImages.instantPot,
+        description: "A versatile electric pressure cooker that also handles slow cooking, rice, steaming, sauteing, yogurt, and warming.",
+        specs: ["7 cooking modes", "Stainless steel inner pot", "Programmable presets", "6-quart size is common"],
+        bestFor: ["Batch cooking", "Rice and beans", "Weeknight meal prep"],
+        watchFor: ["Check capacity before buying", "Duo Plus and Pro models add upgraded controls"],
+        learnedFacts: []
+      },
+      "Kindle Paperwhite": {
+        category: "E-reader",
+        image: productImages.kindle,
+        description: "A waterproof Kindle with a glare-free display, adjustable warm light, and weeks of battery life for reading books and documents.",
+        specs: ["Waterproof design", "Adjustable warm light", "USB-C charging", "High-resolution glare-free display"],
+        bestFor: ["Travel reading", "Night reading", "Library ebooks"],
+        watchFor: ["Ad-supported models cost less", "Storage needs depend on comics and audiobooks"],
+        learnedFacts: []
+      },
+      "Levi's 501 Jeans": {
+        category: "Straight-leg denim",
+        image: productImages.levis,
+        description: "Classic button-fly straight jeans with a regular fit through the thigh and a timeless five-pocket look.",
+        specs: ["Button fly", "Straight leg", "Cotton denim", "Classic five-pocket styling"],
+        bestFor: ["Everyday casual outfits", "Durable basics", "Vintage-inspired denim"],
+        watchFor: ["Wash affects fit and feel", "Check inseam and shrink guidance"],
+        learnedFacts: []
+      }
+    };
+
+    const coupons = [
+      { code: "SUMMER20", store: "Amazon", desc: "20% off electronics", expiry: "Expires May 31", color: "var(--green)", type: "percent", value: 20, categories: ["electronics", "headphones", "e-reader", "phone"], minimum: 25, safeSource: "Demo merchant-approved coupon feed" },
+      { code: "TARGET15", store: "Target", desc: "15% off home & kitchen", expiry: "Expires Jun 15", color: "var(--amber)", type: "percent", value: 15, categories: ["kitchen", "home", "multi-cooker"], minimum: 50, safeSource: "Demo merchant-approved coupon feed" },
+      { code: "LEVIS10", store: "Levi's", desc: "$10 off orders $50+", expiry: "Expires Jun 1", color: "var(--blue)", type: "amount", value: 10, categories: ["clothing", "denim", "jeans"], minimum: 50, safeSource: "Demo merchant-approved coupon feed" },
+      { code: "BESTBUY25", store: "Best Buy", desc: "$25 off selected tech over $250", expiry: "Expires Jun 30", color: "var(--blue)", type: "amount", value: 25, categories: ["electronics", "laptop", "headphones"], minimum: 250, safeSource: "Demo merchant-approved coupon feed" }
+    ];
+
+    const safeDealSources = [
+      { name: "Your Dealwise API", kind: "backend", configured: Boolean(localStorage.getItem("dealwiseApiBase")), note: "Use your own backend with official merchant APIs and affiliate feeds." },
+      { name: "eBay Browse API", kind: "official-api", configured: false, note: "Add OAuth/App credentials in a backend; never ship secret keys in the app." },
+      { name: "Amazon Product Advertising API", kind: "official-api", configured: false, note: "Requires Associates approval and signed backend requests." },
+      { name: "Merchant coupon feeds", kind: "approved-feed", configured: false, note: "Use coupon providers or direct merchant feeds that permit reuse." }
+    ];
+
+    const alerts = [
+      { title: "Sony WH-1000XM5 dropped to $279", subtitle: "Below your $280 target", time: "2h ago", color: "var(--green)" },
+      { title: "Levi's 501 hit an all-time low $48", subtitle: "Lowest price this year", time: "5h ago", color: "var(--green)" },
+      { title: "New coupon TARGET15 added", subtitle: "15% off home & kitchen", time: "Yesterday", color: "var(--amber)" },
+      { title: "Instant Pot dropped 10%", subtitle: "Still $19 above target", time: "2d ago", color: "var(--blue)" }
+    ];
+
+    const els = {
+      navSavings: document.querySelector("#navSavings"),
+      itemsTracked: document.querySelector("#itemsTracked"),
+      totalSavings: document.querySelector("#totalSavings"),
+      readyCount: document.querySelector("#readyCount"),
+      watchlistItems: document.querySelector("#watchlistItems"),
+      emptyState: document.querySelector("#emptyState"),
+      addForm: document.querySelector("#addForm"),
+      itemNameField: document.querySelector("#itemNameField"),
+      itemNameError: document.querySelector("#itemNameError"),
+      itemName: document.querySelector("#itemName"),
+      targetPriceField: document.querySelector("#targetPriceField"),
+      targetPriceError: document.querySelector("#targetPriceError"),
+      targetPrice: document.querySelector("#targetPrice"),
+      store: document.querySelector("#store"),
+      suggestions: document.querySelector("#suggestions"),
+      suggestionList: document.querySelector("#suggestionList"),
+      couponGrid: document.querySelector("#couponGrid"),
+      refreshDeals: document.querySelector("#refreshDeals"),
+      engineStatus: document.querySelector("#engineStatus"),
+      cartResult: document.querySelector("#cartResult"),
+      alertFeed: document.querySelector("#alertFeed"),
+      detailBackdrop: document.querySelector("#detailBackdrop"),
+      detailMedia: document.querySelector("#detailMedia"),
+      detailTitle: document.querySelector("#detailTitle"),
+      detailMeta: document.querySelector("#detailMeta"),
+      detailBody: document.querySelector("#detailBody"),
+      detailClose: document.querySelector("#detailClose"),
+      dealbot: document.querySelector("#dealbot"),
+      dealbotToggle: document.querySelector("#dealbotToggle"),
+      dealbotClose: document.querySelector("#dealbotClose"),
+      dealbotCredits: document.querySelector("#dealbotCredits"),
+      dealbotLog: document.querySelector("#dealbotLog"),
+      dealbotForm: document.querySelector("#dealbotForm"),
+      dealbotInput: document.querySelector("#dealbotInput"),
+      toast: document.querySelector("#toast"),
+      srLive: document.querySelector("#srLive")
+    };
+
+    let nextId = 5;
+    let toastTimer;
+    let pendingRemoveId = null;
+    let pendingRemoveTimer;
+    let selectedSuggestion = null;
+    let activeProductName = "";
+    let dealbotCredits = Number(localStorage.getItem("dealbotCredits") || 200);
+    let dealbotTurn = 0;
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0
+      }).format(value);
+    }
+
+    function normalize(value) {
+      return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    }
+
+    function getStoreLabel(store) {
+      return store && store.trim() ? store.trim() : "Any store";
+    }
+
+    function getItemDetails(item) {
+      const details = productDetails[item.name] || {};
+      return {
+        category: item.category || details.category || "Tracked product",
+        image: item.image || details.image || "",
+        description: item.description || details.description || "A product saved to your Dealwise watchlist.",
+        specs: item.specs || details.specs || [],
+        bestFor: item.bestFor || details.bestFor || [],
+        watchFor: item.watchFor || details.watchFor || [],
+        learnedFacts: item.learnedFacts || details.learnedFacts || []
+      };
+    }
+
+    function isKnownProduct(name) {
+      const query = normalize(name);
+      return items.some(item => normalize(item.name) === query) ||
+        Object.keys(productDetails).some(productName => normalize(productName) === query);
+    }
+
+    function inferBudgetCategory(query) {
+      const q = normalize(query);
+      if (/\b(macbook|laptop|notebook|computer|chromebook|windows|pc)\b/.test(q)) return "laptop";
+      if (/\b(iphone|phone|smartphone|android|pixel|galaxy|mobile)\b/.test(q)) return "phone";
+      return "default";
+    }
+
+    const offerStores = ["Amazon", "Best Buy", "Walmart", "eBay"];
+
+    function typedProductOption(query, target = 0, store = "", offerIndex = 0) {
+      const category = inferBudgetCategory(query);
+      const fallback = budgetCatalog[category][0] || budgetCatalog.default[0];
+      const base = Number(target) > 0 ? Number(target) : fallback.current;
+      const multipliers = [0.92, 0.97, 1, 1.08];
+      const price = Math.max(1, Math.round(base * multipliers[offerIndex]));
+      const offerStore = store || offerStores[offerIndex] || "Any store";
+      return {
+        name: query,
+        store: offerStore,
+        target: base,
+        current: price,
+        original: Math.round(price * 1.22),
+        trend: "stable",
+        image: fallback.image,
+        category: `${category === "laptop" ? "Requested laptop" : "Requested product"} offer`,
+        description: `${query} offer from ${offerStore}. Dealwise keeps the product fixed and compares stores by final price.`,
+        specs: [],
+        bestFor: ["Tracking the exact item you requested"],
+        watchFor: ["Confirm the exact model, seller, condition, and return policy before buying"],
+        learnedFacts: []
+      };
+    }
+
+    function storeOffersForQuery(query, target = 0, preferredStore = "") {
+      const stores = preferredStore
+        ? [preferredStore, ...offerStores.filter(store => normalize(store) !== normalize(preferredStore))]
+        : offerStores;
+      return stores.slice(0, 4)
+        .map((store, index) => typedProductOption(query, target, store, index))
+        .sort((a, b) => a.current - b.current);
+    }
+
+    function localSuggestions(query) {
+      return storeOffersForQuery(query, Number(els.targetPrice.value), els.store.value);
+    }
+
+    function getStatus(item) {
+      if (item.current <= item.target) return { label: "Buy now", className: "buy" };
+      if (item.current <= item.target * 1.15) return { label: "Almost there", className: "almost" };
+      return { label: "Watching", className: "watch" };
+    }
+
+    function getTrendLabel(trend) {
+      if (trend === "dropping") return "↓ Dropping";
+      if (trend === "low") return "★ All-time low";
+      return "→ Stable";
+    }
+
+    function getProgress(item) {
+      if (item.current <= item.target) return 100;
+      const range = Math.max(item.original - item.target, 1);
+      const moved = item.original - item.current;
+      return Math.max(0, Math.min(100, Math.round((moved / range) * 100)));
+    }
+
+    function getSavings() {
+      return items.reduce((sum, item) => sum + Math.max(item.original - item.current, 0), 0);
+    }
+
+    function getReadyCount() {
+      return items.filter(item => item.current <= item.target).length;
+    }
+
+    function getInitials(name) {
+      const words = String(name || "Product")
+        .replace(/[^a-zA-Z0-9 ]/g, " ")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+      return (words[0]?.[0] || "P").toUpperCase() + (words[1]?.[0] || "").toUpperCase();
+    }
+
+    function productMediaMarkup(item, className = "product-media") {
+      return `<div class="${className}" aria-hidden="true">${productMediaContent(item)}</div>`;
+    }
+
+    function productMediaContent(item) {
+      const image = item.image || productDetails[item.name]?.image || "";
+      if (image) {
+        return `<img src="${escapeHtml(image)}" alt="" loading="lazy">`;
+      }
+      return `<span class="product-fallback">${escapeHtml(getInitials(item.name))}</span>`;
+    }
+
+    function simulateItem(name, target, store, suggestion = null) {
+      const current = suggestion?.current || Math.round(target * (1.06 + Math.random() * 0.22));
+      const original = suggestion?.original || Math.round(current * (1.18 + Math.random() * 0.32));
+      const trend = suggestion?.trend || (Math.random() > 0.5 ? "dropping" : "stable");
+      return {
+        id: nextId++,
+        name: suggestion?.name || name,
+        target,
+        current,
+        original,
+        store: getStoreLabel(store || suggestion?.store),
+        trend,
+        image: suggestion?.image || "",
+        category: suggestion?.category,
+        description: suggestion?.description,
+        specs: suggestion?.specs,
+        bestFor: suggestion?.bestFor,
+        watchFor: suggestion?.watchFor,
+        learnedFacts: suggestion?.learnedFacts || []
+      };
+    }
+
+    function showToast(message) {
+      window.clearTimeout(toastTimer);
+      els.toast.textContent = message;
+      els.srLive.textContent = message;
+      els.toast.classList.add("show");
+      toastTimer = window.setTimeout(() => {
+        els.toast.classList.remove("show");
+      }, 2200);
+    }
+
+
+    function getCategoryText(item) {
+      const details = getItemDetails(item);
+      return normalize([item.category, details.category, item.name, ...(details.specs || [])].join(" "));
+    }
+
+    function couponMatchesItem(coupon, item) {
+      const storeMatch = normalize(coupon.store) === normalize(getStoreLabel(item.store));
+      const categoryText = getCategoryText(item);
+      const categoryMatch = (coupon.categories || []).some(category => categoryText.includes(normalize(category)));
+      const minimumOk = Number(item.current || 0) >= Number(coupon.minimum || 0);
+      return storeMatch && categoryMatch && minimumOk;
+    }
+
+    function couponDiscount(coupon, price) {
+      if (!coupon) return 0;
+      if (coupon.type === "percent") return Math.min(price, price * (Number(coupon.value) / 100));
+      return Math.min(price, Number(coupon.value || 0));
+    }
+
+    function bestCouponForItem(item) {
+      return coupons
+        .filter(coupon => couponMatchesItem(coupon, item))
+        .map(coupon => ({ coupon, discount: couponDiscount(coupon, item.current) }))
+        .sort((a, b) => b.discount - a.discount)[0] || null;
+    }
+
+    function finalPriceForItem(item) {
+      const best = bestCouponForItem(item);
+      const discount = best ? best.discount : 0;
+      return {
+        price: Math.max(0, Number(item.current || 0) - discount),
+        discount,
+        coupon: best?.coupon || null
+      };
+    }
+
+    function renderCartOptimizer() {
+      if (!els.cartResult) return;
+      if (!items.length) {
+        els.cartResult.innerHTML = "<span>Add items to see the safest cheapest cart.</span>";
+        return;
+      }
+      const rows = items.map(item => ({ item, final: finalPriceForItem(item) }));
+      const subtotal = rows.reduce((sum, row) => sum + Number(row.item.current || 0), 0);
+      const total = rows.reduce((sum, row) => sum + row.final.price, 0);
+      const savings = subtotal - total;
+      const couponCount = rows.filter(row => row.final.coupon).length;
+      const bestRow = rows.slice().sort((a, b) => a.final.price - b.final.price)[0];
+      els.cartResult.innerHTML = `
+        <div><strong>${formatMoney(total)}</strong> estimated safe cart total after matching coupons.</div>
+        <div>${couponCount} matching coupon${couponCount === 1 ? "" : "s"} applied. Coupon savings: <strong>${formatMoney(savings)}</strong>.</div>
+        <div>Best single checkout: <strong>${escapeHtml(bestRow.item.name)}</strong> at ${formatMoney(bestRow.final.price)}${bestRow.final.coupon ? ` using ${escapeHtml(bestRow.final.coupon.code)}` : " with no matching coupon yet"}.</div>
+      `;
+    }
+
+    function legalDealSearchUrl(item) {
+      return `https://www.google.com/search?q=${encodeURIComponent(`${item.name} ${getStoreLabel(item.store)} official price coupon`)}`;
+    }
+
+    function demoLiveOffer(item) {
+      const categoryText = getCategoryText(item);
+      let factor = 0.97;
+      if (categoryText.includes("headphones") || categoryText.includes("electronics")) factor = 0.94;
+      if (categoryText.includes("kitchen") || categoryText.includes("multi cooker")) factor = 0.91;
+      if (categoryText.includes("jeans") || categoryText.includes("denim")) factor = 0.9;
+      const current = Math.max(1, Math.round(Number(item.current || item.target || 50) * factor));
+      return {
+        store: getStoreLabel(item.store),
+        price: current,
+        original: Math.max(Number(item.original || current), current),
+        url: legalDealSearchUrl(item),
+        source: "Demo safe source fallback",
+        checkedAt: new Date().toISOString()
+      };
+    }
+
+    async function fetchConfiguredDealApi(item) {
+      const apiBase = localStorage.getItem("dealwiseApiBase");
+      if (!apiBase) return null;
+      const url = new URL("/api/deals", apiBase);
+      url.searchParams.set("q", item.name);
+      url.searchParams.set("store", getStoreLabel(item.store));
+      const response = await fetch(url.toString(), { headers: { "accept": "application/json" } });
+      if (!response.ok) throw new Error("Configured deal API failed");
+      const data = await response.json();
+      const offer = Array.isArray(data.offers) ? data.offers[0] : data.offer;
+      if (!offer || !Number.isFinite(Number(offer.price))) return null;
+      return {
+        store: offer.store || getStoreLabel(item.store),
+        price: Number(offer.price),
+        original: Number(offer.original || item.original || offer.price),
+        url: offer.url || legalDealSearchUrl(item),
+        source: offer.source || "Configured Dealwise API",
+        checkedAt: new Date().toISOString()
+      };
+    }
+
+    async function refreshItemDeal(item) {
+      let offer = null;
+      try {
+        offer = await fetchConfiguredDealApi(item);
+      } catch (error) {
+        console.warn("Configured deal API unavailable", error);
+      }
+      if (!offer) offer = demoLiveOffer(item);
+      item.current = offer.price;
+      item.original = Math.max(offer.original, offer.price, item.original || offer.price);
+      item.store = offer.store;
+      item.dealUrl = offer.url;
+      item.safeSource = offer.source;
+      item.lastChecked = offer.checkedAt;
+      item.trend = item.current <= item.target ? "low" : "dropping";
+      const best = finalPriceForItem(item);
+      item.bestFinalPrice = best.price;
+      item.bestCouponCode = best.coupon?.code || "";
+      return item;
+    }
+
+    async function refreshAllDeals() {
+      if (!items.length) {
+        showToast("Add an item before refreshing deals");
+        return;
+      }
+      els.refreshDeals.disabled = true;
+      els.engineStatus.textContent = `Checking ${items.length} tracked item${items.length === 1 ? "" : "s"} through safe sources...`;
+      for (const item of items) {
+        els.engineStatus.textContent = `Checking ${item.name}...`;
+        await refreshItemDeal(item);
+      }
+      els.engineStatus.textContent = "Updated prices, matched coupons, and recalculated cheapest safe cart.";
+      els.refreshDeals.disabled = false;
+      renderApp();
+      renderCoupons();
+      renderAlerts();
+      showToast("Safe deal refresh complete");
+    }
+
+    function renderMetrics() {
+      const savings = getSavings();
+      els.itemsTracked.textContent = items.length;
+      els.totalSavings.textContent = formatMoney(savings);
+      els.readyCount.textContent = getReadyCount();
+      els.navSavings.textContent = formatMoney(savings);
+    }
+
+    function renderWatchlist() {
+      els.watchlistItems.innerHTML = "";
+      els.emptyState.style.display = items.length ? "none" : "block";
+
+      items.forEach(item => {
+        const status = getStatus(item);
+        const progress = getProgress(item);
+        const discount = Math.round(((item.original - item.current) / item.original) * 100);
+
+        const article = document.createElement("article");
+        article.className = "item-card";
+        article.tabIndex = 0;
+        article.dataset.detail = item.id;
+        article.setAttribute("aria-label", `Open details for ${item.name}`);
+        article.innerHTML = `
+          ${productMediaMarkup(item)}
+          <div class="item-main">
+            <h2 class="item-title">${escapeHtml(item.name)}</h2>
+            <div class="meta-line">
+              <span>${escapeHtml(getStoreLabel(item.store))}</span>
+              <span>•</span>
+              <span>Target ${formatMoney(item.target)}</span>
+            </div>
+            ${item.safeSource ? `<div class="meta-line"><span>Source: ${escapeHtml(item.safeSource)}</span></div>` : ""}
+            ${item.bestCouponCode ? `<span class="coupon-match">Best coupon ${escapeHtml(item.bestCouponCode)} → ${formatMoney(item.bestFinalPrice)}</span>` : ""}
+            <div class="badges">
+              <span class="badge ${status.className}">${status.label}</span>
+              <span class="trend-pill">${getTrendLabel(item.trend)}</span>
+            </div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-copy">
+              <span>Target progress</span>
+              <span>${progress}%</span>
+            </div>
+            <div class="progress-track" aria-label="${progress}% toward target price">
+              <div class="progress-fill" style="width: ${progress}%"></div>
+            </div>
+          </div>
+          <div class="price-block">
+            <div class="current-row">
+              <div class="price display-number">${formatMoney(item.current)}</div>
+              <span class="discount">-${discount}%</span>
+            </div>
+            <div class="was-price">was ${formatMoney(item.original)}</div>
+          </div>
+          <div class="actions">
+            <button class="icon-btn" type="button" aria-label="Search ${escapeHtml(getStoreLabel(item.store))} for ${escapeHtml(item.name)}" title="Search store" data-open="${item.id}">↗</button>
+            <button class="icon-btn remove${pendingRemoveId === item.id ? " confirming" : ""}" type="button" aria-label="${pendingRemoveId === item.id ? "Confirm remove" : "Remove"} ${escapeHtml(item.name)}" title="${pendingRemoveId === item.id ? "Confirm remove" : "Remove item"}" data-remove="${item.id}">${pendingRemoveId === item.id ? "Sure?" : "×"}</button>
+          </div>
+        `;
+        els.watchlistItems.appendChild(article);
+      });
+    }
+
+    function renderCoupons() {
+      const relatedCoupons = coupons.filter(coupon => items.some(item => couponMatchesItem(coupon, item)));
+      const visibleCoupons = relatedCoupons.length ? relatedCoupons : coupons;
+      els.couponGrid.innerHTML = visibleCoupons.map(coupon => {
+        const matchedNames = items.filter(item => couponMatchesItem(coupon, item)).map(item => item.name);
+        return `
+          <article class="coupon-card" style="--accent: ${coupon.color};">
+            <p class="coupon-store">${escapeHtml(coupon.store)}</p>
+            <h2 class="coupon-desc">${escapeHtml(coupon.desc)}</h2>
+            <p class="coupon-expiry">${escapeHtml(coupon.expiry)}</p>
+            ${matchedNames.length ? `<p class="coupon-expiry">Matches: ${escapeHtml(matchedNames.slice(0, 2).join(", "))}${matchedNames.length > 2 ? " + more" : ""}</p>` : `<p class="coupon-expiry">No cart match yet</p>`}
+            <p class="coupon-expiry">Source: ${escapeHtml(coupon.safeSource || "Approved coupon feed")}</p>
+            <div class="code-row">
+              <button class="code-box" type="button" data-copy="${escapeHtml(coupon.code)}" aria-label="Copy coupon code ${escapeHtml(coupon.code)}">${escapeHtml(coupon.code)}</button>
+              <button class="copy-btn" type="button" data-copy="${escapeHtml(coupon.code)}" aria-label="Copy ${escapeHtml(coupon.code)} coupon code">Copy</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderAlerts() {
+      els.alertFeed.innerHTML = alerts.map(alert => `
+        <article class="alert-card" style="--accent: ${alert.color};">
+          <span class="dot" aria-hidden="true"></span>
+          <div>
+            <h2 class="alert-title">${escapeHtml(alert.title)}</h2>
+            <p class="alert-subtitle">${escapeHtml(alert.subtitle)}</p>
+          </div>
+          <p class="alert-time">${escapeHtml(alert.time)}</p>
+        </article>
+      `).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function setFieldError(field, input, error, message) {
+      field.classList.toggle("invalid", Boolean(message));
+      input.setAttribute("aria-invalid", String(Boolean(message)));
+      error.textContent = message;
+    }
+
+    function clearFormErrors() {
+      setFieldError(els.itemNameField, els.itemName, els.itemNameError, "");
+      setFieldError(els.targetPriceField, els.targetPrice, els.targetPriceError, "");
+    }
+
+    function validateForm() {
+      const name = els.itemName.value.trim();
+      const target = Number(els.targetPrice.value);
+      const nameMessage = name ? "" : "Enter an item name.";
+      const targetMessage = Number.isFinite(target) && target > 0 ? "" : "Enter a target above $0.";
+
+      setFieldError(els.itemNameField, els.itemName, els.itemNameError, nameMessage);
+      setFieldError(els.targetPriceField, els.targetPrice, els.targetPriceError, targetMessage);
+
+      if (nameMessage) {
+        els.itemName.focus();
+        return null;
+      }
+
+      if (targetMessage) {
+        els.targetPrice.focus();
+        return null;
+      }
+
+      return { name, target: Math.round(target) };
+    }
+
+    async function fetchSuggestions(query) {
+      try {
+        const params = new URLSearchParams({
+          q: query,
+          target: els.targetPrice.value,
+          store: els.store.value
+        });
+        const response = await fetch(`/api/suggest?${params.toString()}`);
+        if (!response.ok) throw new Error("Suggestion lookup failed");
+        const data = await response.json();
+        return data.suggestions || [];
+      } catch {
+        return localSuggestions(query);
+      }
+    }
+
+    function renderSuggestions(suggestions) {
+      if (!suggestions.length) {
+        els.suggestions.classList.remove("show");
+        els.suggestionList.innerHTML = "";
+        return;
+      }
+
+      els.suggestionList.innerHTML = suggestions.map((suggestion, index) => `
+        <button class="suggestion-btn" type="button" data-suggestion="${index}">
+          ${productMediaMarkup(suggestion, "suggestion-thumb")}
+          <span>
+            <strong>${escapeHtml(suggestion.name)}</strong>
+            <span>${escapeHtml(suggestion.category || "Suggested product")} · ${escapeHtml(getStoreLabel(suggestion.store))}</span>
+          </span>
+        </button>
+      `).join("");
+      els.suggestions.classList.add("show");
+      els.suggestionList._suggestions = suggestions;
+    }
+
+    function hideSuggestions() {
+      selectedSuggestion = null;
+      els.suggestions.classList.remove("show");
+      els.suggestionList.innerHTML = "";
+      els.suggestionList._suggestions = [];
+    }
+
+    function renderList(values) {
+      if (!values || !values.length) return "<p>No extra details saved yet.</p>";
+      return `<ul>${values.map(value => `<li>${escapeHtml(value.text || value)}</li>`).join("")}</ul>`;
+    }
+
+    function openDetails(item) {
+      const details = getItemDetails(item);
+      activeProductName = item.name;
+      els.detailMedia.innerHTML = productMediaContent({ ...item, image: details.image });
+      els.detailTitle.textContent = item.name;
+      els.detailMeta.textContent = `${details.category} · ${getStoreLabel(item.store)} · ${getStatus(item).label}`;
+      els.detailBody.innerHTML = `
+        <div class="detail-grid">
+          <div class="detail-stat"><span>Current</span><strong>${formatMoney(item.current)}</strong></div>
+          <div class="detail-stat"><span>Target</span><strong>${formatMoney(item.target)}</strong></div>
+          <div class="detail-stat"><span>Original</span><strong>${formatMoney(item.original)}</strong></div>
+        </div>
+        <section class="detail-section">
+          <h3>Description</h3>
+          <p>${escapeHtml(details.description)}</p>
+        </section>
+        <section class="detail-section">
+          <h3>Specs and features</h3>
+          ${renderList(details.specs)}
+        </section>
+        <section class="detail-section">
+          <h3>Best for</h3>
+          ${renderList(details.bestFor)}
+        </section>
+        <section class="detail-section">
+          <h3>Watch before buying</h3>
+          ${renderList(details.watchFor)}
+        </section>
+        <section class="detail-section">
+          <h3>Dealbot knowledge</h3>
+          ${renderList(details.learnedFacts)}
+        </section>
+      `;
+      els.detailBackdrop.classList.add("show");
+      els.detailBackdrop.setAttribute("aria-hidden", "false");
+      els.detailClose.focus();
+    }
+
+    function closeDetails() {
+      els.detailBackdrop.classList.remove("show");
+      els.detailBackdrop.setAttribute("aria-hidden", "true");
+    }
+
+    function updateCredits() {
+      localStorage.setItem("dealbotCredits", String(dealbotCredits));
+      els.dealbotCredits.textContent = `${dealbotCredits} credits left`;
+    }
+
+    function appendChat(message, sender = "bot") {
+      const bubble = document.createElement("div");
+      bubble.className = `chat-msg ${sender === "user" ? "user" : ""}`;
+      bubble.textContent = message;
+      els.dealbotLog.appendChild(bubble);
+      els.dealbotLog.scrollTop = els.dealbotLog.scrollHeight;
+    }
+
+    function classifyQuestion(question) {
+      const q = normalize(question);
+      if (/\b(specs?|features?|battery|size|dimensions?|waterproof|noise|material|fit)\b/.test(q)) return "specs";
+      if (/\b(buy|worth|deal|good price|pull trigger|purchase)\b/.test(q)) return "buy";
+      if (/\b(wait|when|time|timing|sale|black friday|prime day|drop)\b/.test(q)) return "timing";
+      if (/\b(coupon|code|promo|discount)\b/.test(q)) return "coupon";
+      if (/\b(reviews?|ratings?|complaints?|people say|users say)\b/.test(q)) return "review";
+      if (/\b(compare|versus| vs |alternative|instead|better)\b/.test(` ${q} `)) return "compare";
+      if (/\b(store|where|seller|amazon|target|best buy|walmart|ebay)\b/.test(q)) return "store";
+      if (/\b(risks?|problems?|issues?|watch|fake|return)\b/.test(q)) return "risk";
+      return "general";
+    }
+
+    function compactList(values, fallback) {
+      return Array.isArray(values) && values.length ? values.slice(0, 3).join(", ") : fallback;
+    }
+
+    function reviewAnswer(product, lead) {
+      const known = reviewKnowledge[normalize(product.name)];
+      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(`${product.name} reviews rating`)}`;
+      if (known) {
+        return `${lead} ${known.summary} Ratings saved for this product: ${known.ratings.join(" ")} Common complaints: ${known.complaints.join(" ")} Google review search: ${googleUrl}`;
+      }
+      return `${lead} I can research reviews for ${product.name}, but I do not have a verified rating saved yet. Google review search for this exact item: ${googleUrl}. Look for repeated complaints, star ratings from known review sites, and whether reviewers are discussing the same model/store condition.`;
+    }
+
+    function fallbackDealbot(question) {
+      const product = items.find(item => item.name === activeProductName);
+      if (!product) return "Open a tracked item first, then I will answer only about that product.";
+      const details = getItemDetails(product);
+      const intent = classifyQuestion(question);
+      const leads = ["Here is the practical read:", "Short version:", "My take:", "For this item:"];
+      const lead = leads[dealbotTurn % leads.length];
+      const savings = Math.max(product.original - product.current, 0);
+      const aboveTarget = Math.max(product.current - product.target, 0);
+
+      if (intent === "specs") {
+        return `${lead} ${product.name} is a ${details.category}. Key details: ${compactList(details.specs, details.description)}. Best for: ${compactList(details.bestFor, "general comparison shopping")}.`;
+      }
+      if (intent === "buy") {
+        return product.current <= product.target
+          ? `${lead} I would treat ${product.name} as buy-ready at ${formatMoney(product.current)}. It is within your ${formatMoney(product.target)} target and saves ${formatMoney(savings)} versus the original price.`
+          : `${lead} I would wait on ${product.name}. It is ${formatMoney(aboveTarget)} above target, so a coupon or another drop would matter.`;
+      }
+      if (intent === "timing") {
+        return `${lead} The trend is ${getTrendLabel(product.trend).replace(/[↓→★]/g, "").trim().toLowerCase()}. Current price is ${formatMoney(product.current)} against your ${formatMoney(product.target)} target, so ${product.current <= product.target ? "this is already a good window" : "keep the alert on and wait for the next drop"}.`;
+      }
+      if (intent === "coupon") {
+        return `${lead} Use coupons only against the checkout total. If a code brings ${product.name} to ${formatMoney(product.target)} or less, mark it buy-ready.`;
+      }
+      if (intent === "review") {
+        return reviewAnswer(product, lead);
+      }
+      if (intent === "compare") {
+        return `${lead} Compare alternatives against these must-haves: ${compactList(details.specs, "price, model, warranty")}. Anything weaker should be meaningfully cheaper than ${formatMoney(product.target)}.`;
+      }
+      if (intent === "store") {
+        return `${lead} It is tracked at ${getStoreLabel(product.store)}. I would still search at least two other sellers and confirm the exact model before checkout.`;
+      }
+      if (intent === "risk") {
+        return `${lead} Watch for: ${compactList(details.watchFor, "seller reputation, exact model number, and return window")}. Very low prices deserve a fake/condition check.`;
+      }
+      return `${lead} ${product.name} is ${formatMoney(product.current)} with a ${formatMoney(product.target)} target. ${details.description} The next useful check is exact model plus seller return policy.`;
+    }
+
+    function saveLearnedFact(productName, fact) {
+      const item = items.find(entry => entry.name === productName);
+      if (!item || !fact) return;
+      item.learnedFacts = [...(item.learnedFacts || []), fact].slice(-8);
+      showToast(`Dealbot saved a fact for ${item.name}`);
+    }
+
+    async function copyCode(code, trigger) {
+      try {
+        await navigator.clipboard.writeText(code);
+      } catch (error) {
+        const temp = document.createElement("textarea");
+        temp.value = code;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        temp.remove();
+      }
+      if (trigger) {
+        const previousLabel = trigger.getAttribute("aria-label") || `Copy coupon code ${code}`;
+        trigger.setAttribute("aria-label", `Copied! ${code}`);
+        window.setTimeout(() => trigger.setAttribute("aria-label", previousLabel), 1800);
+      }
+      showToast(`Copied coupon code ${code}`);
+    }
+
+    document.querySelectorAll(".tab-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(tab => {
+          const isActive = tab === button;
+          tab.classList.toggle("active", isActive);
+          tab.setAttribute("aria-selected", String(isActive));
+        });
+        document.querySelectorAll(".panel").forEach(panel => {
+          panel.classList.toggle("active", panel.id === target);
+        });
+      });
+    });
+
+    els.addForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const valid = validateForm();
+
+      if (!valid) {
+        return;
+      }
+
+      if (!selectedSuggestion && !isKnownProduct(valid.name)) {
+        const suggestions = await fetchSuggestions(valid.name);
+        renderSuggestions(suggestions);
+        showToast("Pick a matching product or press Track it again to keep your typed item");
+        selectedSuggestion = { allowManual: true };
+        return;
+      }
+
+      const suggestion = selectedSuggestion?.allowManual ? null : selectedSuggestion;
+      const item = simulateItem(valid.name, valid.target, els.store.value, suggestion);
+      items.unshift(item);
+      els.addForm.reset();
+      clearFormErrors();
+      hideSuggestions();
+      renderApp();
+      showToast(`Tracking ${item.name}`);
+      els.itemName.focus();
+    });
+
+    els.itemName.addEventListener("input", () => {
+      selectedSuggestion = null;
+      hideSuggestions();
+      if (els.itemNameField.classList.contains("invalid")) validateForm();
+    });
+
+    els.targetPrice.addEventListener("input", () => {
+      if (els.targetPriceField.classList.contains("invalid")) validateForm();
+    });
+
+    els.suggestionList.addEventListener("click", event => {
+      const button = event.target.closest("[data-suggestion]");
+      if (!button) return;
+      const suggestion = els.suggestionList._suggestions[Number(button.dataset.suggestion)];
+      if (!suggestion) return;
+      selectedSuggestion = suggestion;
+      els.itemName.value = suggestion.name;
+      if (!els.targetPrice.value && suggestion.target) els.targetPrice.value = suggestion.target;
+      if (suggestion.store) els.store.value = suggestion.store;
+      showToast(`${suggestion.name} selected`);
+    });
+
+    els.watchlistItems.addEventListener("click", event => {
+      const openButton = event.target.closest("[data-open]");
+      const removeButton = event.target.closest("[data-remove]");
+      const detailCard = event.target.closest("[data-detail]");
+
+      if (openButton) {
+        event.stopPropagation();
+        const item = items.find(entry => entry.id === Number(openButton.dataset.open));
+        window.open(item.dealUrl || `https://www.google.com/search?q=${encodeURIComponent(`${item.name} ${getStoreLabel(item.store)}`)}`, "_blank", "noopener");
+        showToast(`Searching Google for ${item.name}`);
+      }
+
+      if (removeButton) {
+        event.stopPropagation();
+        const itemId = Number(removeButton.dataset.remove);
+        const index = items.findIndex(item => item.id === itemId);
+        if (index > -1) {
+          if (pendingRemoveId !== itemId) {
+            pendingRemoveId = itemId;
+            window.clearTimeout(pendingRemoveTimer);
+            renderWatchlist();
+            pendingRemoveTimer = window.setTimeout(() => {
+              pendingRemoveId = null;
+              renderWatchlist();
+            }, 2000);
+            return;
+          }
+
+          window.clearTimeout(pendingRemoveTimer);
+          pendingRemoveId = null;
+          const [removed] = items.splice(index, 1);
+          renderApp();
+          showToast(`Removed ${removed.name}`);
+        }
+      }
+
+      if (detailCard && !openButton && !removeButton) {
+        const item = items.find(entry => entry.id === Number(detailCard.dataset.detail));
+        if (item) openDetails(item);
+      }
+    });
+
+    els.watchlistItems.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const detailCard = event.target.closest("[data-detail]");
+      if (!detailCard) return;
+      event.preventDefault();
+      const item = items.find(entry => entry.id === Number(detailCard.dataset.detail));
+      if (item) openDetails(item);
+    });
+
+    els.refreshDeals.addEventListener("click", refreshAllDeals);
+
+    els.couponGrid.addEventListener("click", event => {
+      const copyTarget = event.target.closest("[data-copy]");
+      if (copyTarget) {
+        copyCode(copyTarget.dataset.copy, copyTarget);
+      }
+    });
+
+    els.detailClose.addEventListener("click", closeDetails);
+
+    els.detailBackdrop.addEventListener("click", event => {
+      if (event.target === els.detailBackdrop) closeDetails();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeDetails();
+    });
+
+    els.dealbotToggle.addEventListener("click", () => {
+      els.dealbot.classList.add("open");
+      els.dealbotInput.focus();
+    });
+
+    els.dealbotClose.addEventListener("click", () => {
+      els.dealbot.classList.remove("open");
+    });
+
+    els.dealbotForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const question = els.dealbotInput.value.trim();
+      if (!question) return;
+      if (!activeProductName) {
+        appendChat("Open a tracked item first, then I will answer only about that product.", "bot");
+        return;
+      }
+      if (dealbotCredits <= 0) {
+        appendChat("You have used the 200 Dealbot demo credits for this browser.", "bot");
+        return;
+      }
+
+      dealbotCredits -= 1;
+      dealbotTurn += 1;
+      updateCredits();
+      els.dealbotInput.value = "";
+      appendChat(question, "user");
+      appendChat("Checking the product database and Google lookup...", "bot");
+
+      try {
+        const response = await fetch("/api/dealbot", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ question, products: items, activeProductName, turn: dealbotTurn })
+        });
+        if (!response.ok) throw new Error("Dealbot backend unavailable");
+        const data = await response.json();
+        els.dealbotLog.lastElementChild.textContent = data.answer;
+        saveLearnedFact(data.productName, data.learnedFact);
+      } catch {
+        els.dealbotLog.lastElementChild.textContent = fallbackDealbot(question);
+      }
+    });
+
+    function renderApp() {
+      renderMetrics();
+      renderWatchlist();
+      renderCartOptimizer();
+    }
+
+    updateCredits();
+    renderApp();
+    renderCoupons();
+    renderAlerts();
+  </script>
+</body>
+</html>
