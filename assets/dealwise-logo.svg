@@ -1,0 +1,18 @@
+<svg width="760" height="256" viewBox="0 0 760 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Dealwise logo</title>
+  <desc id="desc">Dealwise wordmark with a rounded price tag and upward check mark.</desc>
+  <rect width="760" height="256" rx="56" fill="#F7F5F0"/>
+  <g>
+    <path d="M58 78C58 62.536 70.536 50 86 50H164.406C171.832 50 178.954 52.95 184.204 58.2L218.8 92.796C229.734 103.73 229.734 121.458 218.8 132.392L142.392 208.8C131.458 219.734 113.73 219.734 102.796 208.8L66.2 172.204C60.95 166.954 58 159.832 58 152.406V78Z" fill="#1A472A"/>
+    <path d="M73 80C73 69.507 81.507 61 92 61H160.08C164.853 61 169.431 62.896 172.806 66.27L207.73 101.194C215.181 108.645 215.181 120.725 207.73 128.176L136.176 199.73C128.725 207.181 116.645 207.181 109.194 199.73L78.27 168.806C74.896 165.431 73 160.853 73 156.08V80Z" fill="#FFFEFC"/>
+    <path d="M86 87C86 77.611 93.611 70 103 70H155.506C160.279 70 164.857 71.896 168.233 75.27L197.73 104.767C205.181 112.218 205.181 124.299 197.73 131.25L134.25 194.73C126.299 202.181 114.218 202.181 106.767 194.73L91.27 179.233C87.896 175.857 86 171.279 86 166.506V87Z" fill="#E7F0E5"/>
+    <circle cx="146" cy="95" r="13" fill="#C58618"/>
+    <circle cx="146" cy="95" r="6" fill="#FFF3D8"/>
+    <path d="M93 148.5L118.5 174L176 116.5" stroke="#1A472A" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M126 146.5H177V95.5" stroke="#2F6FA8" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M193 55L198.181 68.819L212 74L198.181 79.181L193 93L187.819 79.181L174 74L187.819 68.819L193 55Z" fill="#C58618"/>
+    <path d="M52 188L55.075 196.925L64 200L55.075 203.075L52 212L48.925 203.075L40 200L48.925 196.925L52 188Z" fill="#2F6FA8"/>
+  </g>
+  <text x="272" y="147" fill="#1A472A" font-family="Georgia, 'Times New Roman', serif" font-size="82" font-weight="700" letter-spacing="0">Dealwise</text>
+  <text x="278" y="182" fill="#706A60" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" letter-spacing="3">SMART DEAL TRACKING</text>
+</svg>

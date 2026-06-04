@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dealwise</title>
+  <link rel="icon" href="/assets/dealwise-mark.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
@@ -109,6 +110,13 @@
       align-items: center;
       gap: 10px;
       min-width: 0;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      display: block;
     }
 
     .brand-mark {
@@ -1355,6 +1363,7 @@
     <nav class="topbar" aria-label="Primary">
       <div class="nav-inner">
         <div class="brand" aria-label="Dealwise">
+          <img class="brand-logo" src="/assets/dealwise-mark.svg" alt="" width="42" height="42">
           <div class="brand-mark">Dealwise</div>
           <span class="beta">BETA</span>
         </div>

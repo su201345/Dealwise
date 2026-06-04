@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dealwise</title>
+  <link rel="icon" href="/assets/dealwise-mark.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
@@ -109,6 +110,13 @@
       align-items: center;
       gap: 10px;
       min-width: 0;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      display: block;
     }
 
     .brand-mark {
@@ -325,7 +333,7 @@
 
     .add-form {
       display: grid;
-      grid-template-columns: minmax(220px, 1fr) 160px 180px auto;
+      grid-template-columns: minmax(180px, 1.4fr) minmax(260px, 1.2fr) minmax(150px, 1fr) auto;
       gap: 12px;
       align-items: end;
     }
@@ -378,6 +386,41 @@
       font-weight: 700;
       letter-spacing: 0;
       text-transform: none;
+    }
+
+    .pref-group {
+      display: flex;
+      gap: 6px;
+      min-height: 48px;
+    }
+
+    .pref-btn {
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 48px;
+      padding: 0 8px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #FFFEFC;
+      color: var(--text);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--ease), background var(--ease), color var(--ease), box-shadow var(--ease);
+    }
+
+    .pref-btn:hover {
+      border-color: rgba(26, 71, 42, 0.4);
+    }
+
+    .pref-btn.is-active {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+      box-shadow: 0 6px 16px rgba(26, 71, 42, 0.18);
     }
 
     .primary-btn {
@@ -1000,6 +1043,210 @@
       display: flex;
     }
 
+    /* Login wall: hide the whole app until the user is signed in. */
+    body.auth-required .app-shell,
+    body.auth-required .dealbot {
+      visibility: hidden;
+    }
+
+    .settings-wrap {
+      position: relative;
+    }
+
+    .settings-btn {
+      width: 38px;
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #FFFEFC;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color var(--ease), background var(--ease);
+    }
+
+    .settings-btn:hover {
+      border-color: rgba(26, 71, 42, 0.45);
+      background: white;
+    }
+
+    .settings-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 16px 32px rgba(31, 38, 31, 0.18);
+      z-index: 30;
+    }
+
+    .settings-user {
+      display: grid;
+      gap: 2px;
+      padding: 10px 12px 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 6px;
+    }
+
+    .settings-user strong {
+      font-size: 0.92rem;
+      max-width: 240px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .settings-email {
+      color: var(--muted);
+      font-size: 0.78rem;
+      max-width: 240px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .settings-item {
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      background: transparent;
+      border: 0;
+      border-radius: 8px;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background var(--ease);
+    }
+
+    .settings-item:hover {
+      background: #F5F2EC;
+    }
+
+    .auth-modal {
+      width: min(420px, 100%);
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .auth-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .auth-title {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      margin: 0;
+    }
+
+    .auth-subtitle {
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin: 0 0 16px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin: 12px 0;
+      padding: 4px;
+      background: #F5F2EC;
+      border-radius: 12px;
+    }
+
+    .auth-tab {
+      min-height: 36px;
+      background: transparent;
+      border: 0;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background var(--ease), color var(--ease);
+    }
+
+    .auth-tab.is-active {
+      background: white;
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .auth-error {
+      min-height: 16px;
+      color: var(--red);
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .auth-error:empty {
+      display: none;
+    }
+
+    .auth-submit {
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .auth-google {
+      width: 100%;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: background var(--ease), border-color var(--ease);
+    }
+
+    .auth-google:hover {
+      background: #F8F6F1;
+      border-color: rgba(26, 71, 42, 0.4);
+    }
+
     .detail-modal {
       width: min(760px, 100%);
       max-height: min(760px, calc(100vh - 36px));
@@ -1084,6 +1331,32 @@
     .detail-section ul {
       margin: 0;
       padding-left: 18px;
+    }
+
+    .detail-loading {
+      padding: 18px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .detail-rating {
+      padding: 6px 12px;
+      background: #F5F2EC;
+      border-radius: 8px;
+      display: inline-block;
+      margin: 0 0 12px;
+      font-size: 0.9rem;
+    }
+
+    .detail-disclaimer {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-style: italic;
+      margin-top: 14px;
+    }
+
+    .detail-refresh {
+      margin-top: 8px;
     }
 
     .dealbot {
@@ -1230,6 +1503,10 @@
         grid-template-columns: 1fr 1fr;
       }
 
+      #targetPriceField {
+        grid-column: span 2;
+      }
+
       .primary-btn {
         grid-column: span 2;
       }
@@ -1286,8 +1563,12 @@
         font-size: clamp(2.65rem, 15vw, 4.2rem);
       }
 
-      .add-form {
+      form.add-form {
         grid-template-columns: 1fr;
+      }
+
+      form.add-form > * {
+        grid-column: 1 / -1;
       }
 
       .primary-btn {
@@ -1349,12 +1630,20 @@
       }
     }
   </style>
+  <script type="module">
+    // Load Supabase from CDN as an ES module and expose it globally for the
+    // main inline script (which is a classic script and can't import directly).
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    window.supabaseCreateClient = createClient;
+    window.dispatchEvent(new Event("supabase-sdk-ready"));
+  </script>
 </head>
-<body>
+<body class="auth-required">
   <div class="app-shell">
     <nav class="topbar" aria-label="Primary">
       <div class="nav-inner">
         <div class="brand" aria-label="Dealwise">
+          <img class="brand-logo" src="/assets/dealwise-mark.svg" alt="" width="42" height="42">
           <div class="brand-mark">Dealwise</div>
           <span class="beta">BETA</span>
         </div>
@@ -1368,6 +1657,22 @@
         <div class="savings-total" aria-live="polite">
           <strong id="navSavings">$0</strong>
           <span>saved</span>
+        </div>
+
+        <div class="settings-wrap" id="settingsWrap" hidden>
+          <button class="settings-btn" id="settingsBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+          <div class="settings-menu" id="settingsMenu" role="menu" hidden>
+            <div class="settings-user">
+              <strong id="userName">Account</strong>
+              <span id="userEmail" class="settings-email"></span>
+            </div>
+            <button class="settings-item" id="signOutBtn" type="button" role="menuitem">Log out</button>
+          </div>
         </div>
       </div>
     </nav>
@@ -1406,21 +1711,23 @@
               <input id="itemName" name="itemName" type="text" placeholder="Air fryer, running shoes..." autocomplete="off" aria-describedby="itemNameError" aria-invalid="false">
               <span class="field-error" id="itemNameError" aria-live="polite"></span>
             </label>
-            <label class="field" id="targetPriceField">
-              Target price
-              <input id="targetPrice" name="targetPrice" type="number" min="1" step="1" placeholder="120" aria-describedby="targetPriceError" aria-invalid="false">
+            <div class="field" id="targetPriceField">
+              Price preference
+              <div class="pref-group" role="radiogroup" aria-label="Price preference">
+                <button type="button" class="pref-btn is-active" data-pref="cheapest" role="radio" aria-checked="true">Cheapest</button>
+                <button type="button" class="pref-btn" data-pref="quality" role="radio" aria-checked="false">Best quality</button>
+                <button type="button" class="pref-btn" data-pref="custom" role="radio" aria-checked="false">Set my price</button>
+              </div>
+              <input id="targetPrice" name="targetPrice" type="number" min="1" step="1" placeholder="Your price" aria-describedby="targetPriceError" aria-invalid="false" hidden>
               <span class="field-error" id="targetPriceError" aria-live="polite"></span>
-            </label>
+            </div>
             <label class="field">
-              Store optional
+              Store
               <select id="store" name="store">
-                <option value="">No store preference</option>
-                <option>Amazon</option>
-                <option>Target</option>
-                <option>Best Buy</option>
-                <option>Walmart</option>
-                <option>eBay</option>
-                <option>Other</option>
+                <option value="">Select an option</option>
+                <option>In-store</option>
+                <option>Delivery</option>
+                <option>Pick up</option>
               </select>
             </label>
             <button class="primary-btn" type="submit">Track it</button>
@@ -1527,6 +1834,46 @@
         <button class="icon-btn" type="button" id="detailClose" aria-label="Close product details">×</button>
       </header>
       <div class="detail-body" id="detailBody"></div>
+    </article>
+  </div>
+
+  <div class="modal-backdrop" id="authBackdrop" aria-hidden="true">
+    <article class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <header class="auth-head">
+        <h2 class="auth-title" id="authTitle">Sign in to Dealwise</h2>
+        <button class="icon-btn" type="button" id="authClose" aria-label="Close sign in" hidden>×</button>
+      </header>
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab is-active" type="button" data-auth-tab="signin" role="tab" aria-selected="true">Sign in</button>
+        <button class="auth-tab" type="button" data-auth-tab="signup" role="tab" aria-selected="false">Sign up</button>
+      </div>
+      <p class="auth-subtitle" id="authSubtitle">Sign in to save your tracked items across devices.</p>
+      <form class="auth-form" id="authForm" novalidate>
+        <label class="field auth-field" id="authNameField" hidden>
+          Display name
+          <input id="authName" name="name" type="text" autocomplete="name" placeholder="Suhas">
+        </label>
+        <label class="field auth-field">
+          Email
+          <input id="authEmail" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+        </label>
+        <label class="field auth-field">
+          Password
+          <input id="authPassword" name="password" type="password" autocomplete="current-password" required minlength="6" placeholder="At least 6 characters">
+        </label>
+        <p class="auth-error" id="authError" role="alert" aria-live="polite"></p>
+        <button class="primary-btn auth-submit" type="submit" id="authSubmit">Sign in</button>
+      </form>
+      <div class="auth-divider"><span>or</span></div>
+      <button class="auth-google" type="button" id="authGoogle">
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <path d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.13-.84 2.08-1.78 2.72v2.26h2.88c1.69-1.55 2.66-3.84 2.66-6.63z" fill="#4285F4"/>
+          <path d="M9 18c2.4 0 4.42-.8 5.9-2.17l-2.88-2.26c-.8.54-1.83.86-3.02.86-2.32 0-4.29-1.57-5-3.67H1.02v2.33C2.5 15.99 5.5 18 9 18z" fill="#34A853"/>
+          <path d="M4 10.76c-.18-.55-.29-1.13-.29-1.76s.11-1.21.29-1.76V4.91H1.02C.37 6.16 0 7.55 0 9s.37 2.84 1.02 4.09L4 10.76z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.32 0 2.5.45 3.42 1.34l2.56-2.56C13.42.89 11.4 0 9 0 5.5 0 2.5 2.01 1.02 4.91L4 7.24C4.71 5.14 6.68 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
     </article>
   </div>
 
@@ -1735,6 +2082,8 @@
       targetPriceField: document.querySelector("#targetPriceField"),
       targetPriceError: document.querySelector("#targetPriceError"),
       targetPrice: document.querySelector("#targetPrice"),
+      prefGroup: document.querySelector(".pref-group"),
+      prefButtons: Array.from(document.querySelectorAll(".pref-btn")),
       store: document.querySelector("#store"),
       suggestions: document.querySelector("#suggestions"),
       suggestionList: document.querySelector("#suggestionList"),
@@ -1754,7 +2103,26 @@
       dealbotForm: document.querySelector("#dealbotForm"),
       dealbotInput: document.querySelector("#dealbotInput"),
       toast: document.querySelector("#toast"),
-      srLive: document.querySelector("#srLive")
+      srLive: document.querySelector("#srLive"),
+      settingsWrap: document.querySelector("#settingsWrap"),
+      settingsBtn: document.querySelector("#settingsBtn"),
+      settingsMenu: document.querySelector("#settingsMenu"),
+      signOutBtn: document.querySelector("#signOutBtn"),
+      userName: document.querySelector("#userName"),
+      userEmail: document.querySelector("#userEmail"),
+      authBackdrop: document.querySelector("#authBackdrop"),
+      authClose: document.querySelector("#authClose"),
+      authForm: document.querySelector("#authForm"),
+      authTitle: document.querySelector("#authTitle"),
+      authSubtitle: document.querySelector("#authSubtitle"),
+      authTabs: Array.from(document.querySelectorAll(".auth-tab")),
+      authName: document.querySelector("#authName"),
+      authNameField: document.querySelector("#authNameField"),
+      authEmail: document.querySelector("#authEmail"),
+      authPassword: document.querySelector("#authPassword"),
+      authError: document.querySelector("#authError"),
+      authSubmit: document.querySelector("#authSubmit"),
+      authGoogle: document.querySelector("#authGoogle")
     };
 
     let nextId = 5;
@@ -1762,6 +2130,7 @@
     let pendingRemoveId = null;
     let pendingRemoveTimer;
     let selectedSuggestion = null;
+    let pricePref = "cheapest";
     let activeProductName = "";
     let dealbotCredits = Number(localStorage.getItem("dealbotCredits") || 200);
     let dealbotTurn = 0;
@@ -1798,6 +2167,43 @@
         return parsed.toString();
       } catch (_) {
         return url;
+      }
+    }
+
+    // Map a store name to the URL that lands directly on that retailer's
+    // product search results page (NOT a Google search). Falls back to Google
+    // shopping for unknown stores.
+    function buildStoreProductUrl(item) {
+      const name = String(item?.name || "").trim();
+      // Prefer the actual retailer (set when the user picks a match), and only
+      // fall back to whatever's in `store` if that's a known retailer name.
+      const source = String(item?.retailer || item?.store || "").trim().toLowerCase();
+      const q = encodeURIComponent(name);
+      switch (source) {
+        case "amazon":
+          return buildAffiliateUrl(`https://www.amazon.com/s?k=${q}`);
+        case "best buy":
+        case "bestbuy":
+          return `https://www.bestbuy.com/site/searchpage.jsp?st=${q}`;
+        case "walmart":
+          return `https://www.walmart.com/search?q=${q}`;
+        case "target":
+          return `https://www.target.com/s?searchTerm=${q}`;
+        case "ebay":
+          return `https://www.ebay.com/sch/i.html?_nkw=${q}`;
+        case "costco":
+          return `https://www.costco.com/CatalogSearch?keyword=${q}`;
+        case "newegg":
+          return `https://www.newegg.com/p/pl?d=${q}`;
+        case "home depot":
+        case "homedepot":
+          return `https://www.homedepot.com/s/${q}`;
+        case "levi's":
+        case "levis":
+          return `https://www.levi.com/US/en_US/search?q=${q}`;
+        default:
+          // No known store -> Google Shopping (still a product listing, not generic web).
+          return `https://www.google.com/search?tbm=shop&q=${q}`;
       }
     }
 
@@ -1918,16 +2324,22 @@
     }
 
     function simulateItem(name, target, store, suggestion = null) {
-      const current = suggestion?.current || Math.round(target * (1.06 + Math.random() * 0.22));
+      const current = suggestion?.current || Math.round((target || 100) * (1.06 + Math.random() * 0.22));
       const original = suggestion?.original || Math.round(current * (1.18 + Math.random() * 0.32));
       const trend = suggestion?.trend || (Math.random() > 0.5 ? "dropping" : "stable");
+      // No target set: aim a little below the current price so progress still reads sensibly.
+      const resolvedTarget = target > 0 ? target : (suggestion?.target || Math.round(current * 0.9));
       return {
         id: nextId++,
         name: suggestion?.name || name,
-        target,
+        target: resolvedTarget,
         current,
         original,
-        store: getStoreLabel(store || suggestion?.store),
+        // store = the user's fulfillment preference (In-store / Delivery / Pick up).
+        // retailer = the actual retailer (Amazon / Walmart / Target / ...) used to
+        // build the "open product page" deep link.
+        store: getStoreLabel(store),
+        retailer: suggestion?.store || "",
         trend,
         image: suggestion?.image || "",
         category: suggestion?.category,
@@ -2002,7 +2414,7 @@
             <div class="was-price">was ${formatMoney(item.original)}</div>
           </div>
           <div class="actions">
-            <button class="icon-btn" type="button" aria-label="Search ${escapeHtml(getStoreLabel(item.store))} for ${escapeHtml(item.name)}" title="Search store" data-open="${item.id}">↗</button>
+            <button class="icon-btn" type="button" aria-label="Open ${escapeHtml(item.retailer || "store")} page for ${escapeHtml(item.name)}" title="Open product page" data-open="${item.id}">↗</button>
             <button class="icon-btn remove${pendingRemoveId === item.id ? " confirming" : ""}" type="button" aria-label="${pendingRemoveId === item.id ? "Confirm remove" : "Remove"} ${escapeHtml(item.name)}" title="${pendingRemoveId === item.id ? "Confirm remove" : "Remove item"}" data-remove="${item.id}">${pendingRemoveId === item.id ? "Sure?" : "×"}</button>
           </div>
         `;
@@ -2059,9 +2471,14 @@
 
     function validateForm() {
       const name = els.itemName.value.trim();
-      const target = Number(els.targetPrice.value);
+      const isCustom = pricePref === "custom";
+      const rawTarget = isCustom ? els.targetPrice.value.trim() : "";
+      const target = Number(rawTarget);
       const nameMessage = name ? "" : "Enter an item name.";
-      const targetMessage = Number.isFinite(target) && target > 0 ? "" : "Enter a target above $0.";
+      // Custom price is optional, but if typed it must be a positive number.
+      const targetMessage = isCustom && rawTarget && !(Number.isFinite(target) && target > 0)
+        ? "Enter a price above $0, or leave it blank."
+        : "";
 
       setFieldError(els.itemNameField, els.itemName, els.itemNameError, nameMessage);
       setFieldError(els.targetPriceField, els.targetPrice, els.targetPriceError, targetMessage);
@@ -2076,15 +2493,16 @@
         return null;
       }
 
-      return { name, target: Math.round(target) };
+      return { name, target: rawTarget ? Math.round(target) : 0, pref: pricePref };
     }
 
     async function fetchSuggestions(query) {
       try {
         const params = new URLSearchParams({
           q: query,
-          target: els.targetPrice.value,
-          store: els.store.value
+          target: pricePref === "custom" ? els.targetPrice.value : "",
+          store: els.store.value,
+          pref: pricePref
         });
         const response = await fetch(`/api/suggest?${params.toString()}`);
         if (!response.ok) throw new Error("Suggestion lookup failed");
@@ -2127,42 +2545,89 @@
       return `<ul>${values.map(value => `<li>${escapeHtml(value.text || value)}</li>`).join("")}</ul>`;
     }
 
-    function openDetails(item) {
-      const details = getItemDetails(item);
-      activeProductName = item.name;
-      els.dealbotCredits.textContent = `${dealbotCredits} credits · ${item.name}`;
-      els.detailMedia.innerHTML = productMediaContent({ ...item, image: details.image });
-      els.detailTitle.textContent = item.name;
-      els.detailMeta.textContent = `${details.category} · ${getStoreLabel(item.store)} · ${getStatus(item).label}`;
+    function renderDetailBody(item, details, options = {}) {
+      const status = getStatus(item);
+      const isLoading = options.loading;
+      const reviewSection = isLoading
+        ? `<p class="detail-loading">Generating live details and review summary…</p>`
+        : `
+          ${details.rating_estimate ? `<p class="detail-rating"><strong>Rating:</strong> ${escapeHtml(details.rating_estimate)}</p>` : ""}
+          <section class="detail-section">
+            <h3>Description</h3>
+            <p>${escapeHtml(details.description || "No description available.")}</p>
+          </section>
+          <section class="detail-section">
+            <h3>Specs and features</h3>
+            ${renderList(details.specs)}
+          </section>
+          <section class="detail-section">
+            <h3>Pros</h3>
+            ${renderList(details.pros)}
+          </section>
+          <section class="detail-section">
+            <h3>Cons</h3>
+            ${renderList(details.cons)}
+          </section>
+          <section class="detail-section">
+            <h3>What reviewers say</h3>
+            <p>${escapeHtml(details.review_summary || "No review summary available.")}</p>
+          </section>
+          <section class="detail-section">
+            <h3>Dealbot knowledge</h3>
+            ${renderList(item.learnedFacts || [])}
+          </section>
+          <p class="detail-disclaimer">Details and reviews are AI-generated. Verify before buying.</p>
+          <button class="auth-btn-secondary detail-refresh" type="button" id="detailRefreshBtn">Refresh details</button>
+        `;
       els.detailBody.innerHTML = `
         <div class="detail-grid">
           <div class="detail-stat"><span>Current</span><strong>${formatMoney(item.current)}</strong></div>
           <div class="detail-stat"><span>Target</span><strong>${formatMoney(item.target)}</strong></div>
           <div class="detail-stat"><span>Original</span><strong>${formatMoney(item.original)}</strong></div>
         </div>
-        <section class="detail-section">
-          <h3>Description</h3>
-          <p>${escapeHtml(details.description)}</p>
-        </section>
-        <section class="detail-section">
-          <h3>Specs and features</h3>
-          ${renderList(details.specs)}
-        </section>
-        <section class="detail-section">
-          <h3>Best for</h3>
-          ${renderList(details.bestFor)}
-        </section>
-        <section class="detail-section">
-          <h3>Watch before buying</h3>
-          ${renderList(details.watchFor)}
-        </section>
-        <section class="detail-section">
-          <h3>Dealbot knowledge</h3>
-          ${renderList(details.learnedFacts)}
-        </section>
+        ${reviewSection}
       `;
+      const refreshBtn = document.querySelector("#detailRefreshBtn");
+      if (refreshBtn) refreshBtn.addEventListener("click", () => loadProductDetails(item, { force: true }));
+    }
+
+    async function loadProductDetails(item, { force = false } = {}) {
+      if (item.details && !force) {
+        renderDetailBody(item, item.details);
+        return;
+      }
+      renderDetailBody(item, {}, { loading: true });
+      try {
+        const response = await fetch("/api/product-details", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name: item.name, retailer: item.retailer || "" })
+        });
+        if (!response.ok) throw new Error("details lookup failed");
+        const data = await response.json();
+        item.details = data.details || {};
+        renderDetailBody(item, item.details);
+        // Persist so Dealbot has it as context and we don't re-fetch on next open.
+        window.dealwiseAuth?.queueItemsSave();
+      } catch (error) {
+        console.error("Product details fetch failed:", error);
+        renderDetailBody(item, {
+          description: "Could not load AI-generated details right now.",
+          specs: [], pros: [], cons: [], review_summary: "", rating_estimate: ""
+        });
+      }
+    }
+
+    function openDetails(item) {
+      activeProductName = item.name;
+      els.dealbotCredits.textContent = `${dealbotCredits} credits · ${item.name}`;
+      const fallback = getItemDetails(item);
+      els.detailMedia.innerHTML = productMediaContent({ ...item, image: item.image || fallback.image });
+      els.detailTitle.textContent = item.name;
+      els.detailMeta.textContent = `${item.retailer || fallback.category || "Tracked product"} · ${getStoreLabel(item.store)} · ${getStatus(item).label}`;
       els.detailBackdrop.classList.add("show");
       els.detailBackdrop.setAttribute("aria-hidden", "false");
+      loadProductDetails(item);
       els.detailClose.focus();
     }
 
@@ -2174,6 +2639,7 @@
 
     function updateCredits() {
       localStorage.setItem("dealbotCredits", String(dealbotCredits));
+      window.dealwiseAuth?.queueCreditsSave();
       const productSuffix = activeProductName ? ` · ${activeProductName}` : " left";
       els.dealbotCredits.textContent = `${dealbotCredits} credits${productSuffix}`;
     }
@@ -2303,7 +2769,17 @@
       }
 
       if (!selectedSuggestion && !isKnownProduct(valid.name)) {
-        const suggestions = await fetchSuggestions(valid.name);
+        const submitBtn = els.addForm.querySelector("button[type=submit]");
+        const originalLabel = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Finding matches…";
+        let suggestions = [];
+        try {
+          suggestions = await fetchSuggestions(valid.name);
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalLabel;
+        }
         renderSuggestions(suggestions);
         showToast("Pick a matching product or press Track it again to keep your typed item");
         selectedSuggestion = { allowManual: true };
@@ -2314,34 +2790,51 @@
       const item = simulateItem(valid.name, valid.target, els.store.value, suggestion);
       items.unshift(item);
       els.addForm.reset();
+      setPricePref("cheapest");
       clearFormErrors();
       hideSuggestions();
       renderApp();
       showToast(`Tracking ${item.name}`);
       els.itemName.focus();
+      window.dealwiseAuth?.queueItemsSave();
     });
 
-    let suggestionDebounce = null;
-    let suggestionRequestId = 0;
     els.itemName.addEventListener("input", () => {
+      // Matches are only fetched when the user clicks "Track it", so editing the
+      // item name clears any previously selected/shown matches.
       selectedSuggestion = null;
       if (els.itemNameField.classList.contains("invalid")) validateForm();
-      const query = els.itemName.value.trim();
-      window.clearTimeout(suggestionDebounce);
-      if (query.length < 2) {
-        hideSuggestions();
-        return;
-      }
-      suggestionDebounce = window.setTimeout(async () => {
-        const requestId = ++suggestionRequestId;
-        const suggestions = await fetchSuggestions(query);
-        if (requestId !== suggestionRequestId) return;
-        renderSuggestions(suggestions);
-      }, 180);
+      hideSuggestions();
     });
 
     els.targetPrice.addEventListener("input", () => {
+      // Editing the price re-runs the lookup on the next Track it click.
+      selectedSuggestion = null;
+      hideSuggestions();
       if (els.targetPriceField.classList.contains("invalid")) validateForm();
+    });
+
+    function setPricePref(pref) {
+      pricePref = pref;
+      els.prefButtons.forEach(btn => {
+        const active = btn.dataset.pref === pref;
+        btn.classList.toggle("is-active", active);
+        btn.setAttribute("aria-checked", String(active));
+      });
+      const isCustom = pref === "custom";
+      els.targetPrice.hidden = !isCustom;
+      if (!isCustom) {
+        setFieldError(els.targetPriceField, els.targetPrice, els.targetPriceError, "");
+      } else {
+        els.targetPrice.focus();
+      }
+      // Changing the preference invalidates any shown matches.
+      selectedSuggestion = null;
+      hideSuggestions();
+    }
+
+    els.prefButtons.forEach(btn => {
+      btn.addEventListener("click", () => setPricePref(btn.dataset.pref));
     });
 
     els.suggestionList.addEventListener("click", event => {
@@ -2356,6 +2849,13 @@
       showToast(`${suggestion.name} selected`);
     });
 
+    // Items now use Supabase UUIDs (strings) instead of session-local numbers,
+    // so compare as strings everywhere.
+    function findItemById(rawId) {
+      const id = String(rawId);
+      return items.find(entry => String(entry.id) === id);
+    }
+
     els.watchlistItems.addEventListener("click", event => {
       const openButton = event.target.closest("[data-open]");
       const removeButton = event.target.closest("[data-remove]");
@@ -2363,21 +2863,21 @@
 
       if (openButton) {
         event.stopPropagation();
-        const item = items.find(entry => entry.id === Number(openButton.dataset.open));
-        const isAmazon = (item.store || "").trim().toLowerCase() === "amazon";
-        const destination = isAmazon
-          ? buildAffiliateUrl(`https://www.amazon.com/s?k=${encodeURIComponent(item.name)}`)
-          : `https://www.google.com/search?q=${encodeURIComponent(`${item.name} ${getStoreLabel(item.store)}`)}`;
+        const item = findItemById(openButton.dataset.open);
+        if (!item) return;
+        const retailerLabel = item.retailer || "product page";
+        const destination = buildStoreProductUrl(item);
         window.open(destination, "_blank", "noopener");
-        showToast(isAmazon ? `Opening Amazon for ${item.name}` : `Searching Google for ${item.name}`);
+        showToast(`Opening ${retailerLabel} for ${item.name}`);
+        return;
       }
 
       if (removeButton) {
         event.stopPropagation();
-        const itemId = Number(removeButton.dataset.remove);
-        const index = items.findIndex(item => item.id === itemId);
+        const itemId = String(removeButton.dataset.remove);
+        const index = items.findIndex(item => String(item.id) === itemId);
         if (index > -1) {
-          if (pendingRemoveId !== itemId) {
+          if (String(pendingRemoveId) !== itemId) {
             pendingRemoveId = itemId;
             window.clearTimeout(pendingRemoveTimer);
             renderWatchlist();
@@ -2396,12 +2896,14 @@
             els.dealbotCredits.textContent = `${dealbotCredits} credits left`;
           }
           renderApp();
+          window.dealwiseAuth?.queueItemsSave();
           showToast(`Removed ${removed.name}`);
         }
+        return;
       }
 
-      if (detailCard && !openButton && !removeButton) {
-        const item = items.find(entry => entry.id === Number(detailCard.dataset.detail));
+      if (detailCard) {
+        const item = findItemById(detailCard.dataset.detail);
         if (item) openDetails(item);
       }
     });
@@ -2411,7 +2913,7 @@
       const detailCard = event.target.closest("[data-detail]");
       if (!detailCard) return;
       event.preventDefault();
-      const item = items.find(entry => entry.id === Number(detailCard.dataset.detail));
+      const item = findItemById(detailCard.dataset.detail);
       if (item) openDetails(item);
     });
 
@@ -2445,12 +2947,8 @@
       event.preventDefault();
       const question = els.dealbotInput.value.trim();
       if (!question) return;
-      if (!activeProductName) {
-        appendChat("Open a tracked item first, then I will answer only about that product.", "bot");
-        return;
-      }
       if (dealbotCredits <= 0) {
-        appendChat("You have used the 200 Dealbot demo credits for this browser.", "bot");
+        appendChat("You have used your 200 Dealbot demo credits.", "bot");
         return;
       }
 
@@ -2459,55 +2957,41 @@
       updateCredits();
       els.dealbotInput.value = "";
       appendChat(question, "user");
-      appendChat("Checking the product database and Google lookup...", "bot");
+      appendChat("Thinking…", "bot");
 
       try {
-        const product = items.find(item => item.name === activeProductName);
-        const details = product ? getItemDetails(product) : {};
-        const systemPrompt = `You are Dealbot, a sharp and practical shopping assistant inside the Dealwise price-tracker app. The user has opened a product from their watchlist and is asking about it.
+        // Send the FULL watchlist (with cached details) so Dealbot can answer
+        // about any tracked item, not just the currently-open one.
+        const watchlist = items.map(item => ({
+          id: item.id,
+          name: item.name,
+          retailer: item.retailer || "",
+          store: item.store || "",
+          current: item.current,
+          target: item.target,
+          original: item.original,
+          trend: item.trend,
+          details: item.details || null
+        }));
 
-ACTIVE PRODUCT:
-- Name: ${activeProductName}
-- Category: ${details.category || "tracked product"}
-- Current price: ${product ? formatMoney(product.current) : "unknown"}
-- Target price: ${product ? formatMoney(product.target) : "unknown"}
-- Original price: ${product ? formatMoney(product.original) : "unknown"}
-- Store: ${product ? getStoreLabel(product.store) : "unknown"}
-- Price trend: ${product ? getTrendLabel(product.trend) : "unknown"}
-- Description: ${details.description || "no description saved"}
-- Specs: ${(details.specs || []).join(", ") || "none saved"}
-- Best for: ${(details.bestFor || []).join(", ") || "none saved"}
-- Watch for: ${(details.watchFor || []).join(", ") || "none saved"}
-
-SAVED REVIEW KNOWLEDGE for this product:
-${JSON.stringify(reviewKnowledge[normalize(activeProductName)] || {}, null, 2)}
-
-RULES:
-- Answer only about the active product above.
-- For review/rating questions: give real ratings from the saved knowledge if available (Tom's Guide: 4.5/5, What Hi-Fi?: 5/5, Digital Trends: Editors Choice, RTINGS: strong commute/travel scores). Also note common complaints. Be specific with numbers.
-- For price/buy questions: use the actual prices above and give a clear buy or wait verdict.
-- For alternatives: suggest 2-3 real budget alternatives from the same category with rough price ranges.
-- Keep answers under 120 words. Be direct and practical. No fluff.
-- Start with one of these rotating leads (turn ${dealbotTurn % 4 === 0 ? 0 : dealbotTurn % 4}): "Here is the practical read:", "Short version:", "My take:", "For this item:"`;
-
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
+        const response = await fetch("/api/dealbot", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            model: "claude-sonnet-4-20250514",
-            max_tokens: 1000,
-            system: systemPrompt,
-            messages: [{ role: "user", content: question }]
-          })
+          body: JSON.stringify({ question, watchlist, activeProductName })
         });
-        if (!response.ok) throw new Error("Dealbot API unavailable");
+        if (!response.ok) throw new Error("Dealbot API error " + response.status);
         const data = await response.json();
-        const answer = data.content?.map(b => b.text || "").join("").trim() || fallbackDealbot(question);
+        const answer = (data.answer || "").trim() || "Dealbot didn't return an answer.";
         els.dealbotLog.lastElementChild.textContent = answer;
-        const learnedFact = { text: answer, source: "Dealbot AI", savedAt: new Date().toISOString() };
-        saveLearnedFact(activeProductName, learnedFact);
-      } catch {
-        els.dealbotLog.lastElementChild.textContent = fallbackDealbot(question);
+
+        // If Dealbot identified a tracked item, save the answer as a learned fact on it.
+        const matched = items.find(it => String(it.id) === String(data.matchedItemId));
+        if (matched) {
+          saveLearnedFact(matched.name, { text: answer, source: "Dealbot AI", savedAt: new Date().toISOString() });
+        }
+      } catch (error) {
+        console.error("Dealbot request failed:", error);
+        els.dealbotLog.lastElementChild.textContent = "Dealbot is unavailable right now. Try again in a moment.";
       }
     });
 
@@ -2520,6 +3004,305 @@ RULES:
     renderApp();
     renderCoupons();
     renderAlerts();
+
+    // ============================================================
+    //  Auth + per-user sync (Supabase)
+    // ============================================================
+    const auth = {
+      client: null,
+      user: null,
+      profile: null,
+      mode: "signin",   // "signin" | "signup"
+      locked: true,     // true while the login wall is up
+      saveTimer: null
+    };
+
+    async function bootAuth() {
+      try {
+        const cfgRes = await fetch("/api/config");
+        const cfg = await cfgRes.json();
+        if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) {
+          console.warn("Supabase config missing; auth disabled.");
+          document.body.classList.remove("auth-required");
+          return;
+        }
+        // Wait for the ES-module SDK shim if it hasn't loaded yet.
+        if (typeof window.supabaseCreateClient !== "function") {
+          await new Promise(resolve => window.addEventListener("supabase-sdk-ready", resolve, { once: true }));
+        }
+        auth.client = window.supabaseCreateClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+          auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+        });
+
+        auth.client.auth.onAuthStateChange((event, session) => {
+          handleAuthChange(session?.user || null);
+        });
+
+        const { data } = await auth.client.auth.getSession();
+        await handleAuthChange(data.session?.user || null);
+      } catch (error) {
+        console.error("Auth boot failed:", error);
+        // Drop the wall on boot failure so the app remains usable in degraded mode.
+        document.body.classList.remove("auth-required");
+      }
+    }
+
+    async function handleAuthChange(user) {
+      const wasSignedIn = !!auth.user;
+      auth.user = user;
+
+      if (user) {
+        // Load profile + items from Supabase, replace local state.
+        const [{ data: profile }, { data: rows }] = await Promise.all([
+          auth.client.from("profiles").select("*").eq("id", user.id).single(),
+          auth.client.from("tracked_items").select("*").eq("user_id", user.id).order("created_at", { ascending: false })
+        ]);
+        auth.profile = profile || null;
+        if (profile) {
+          dealbotCredits = Number(profile.dealbot_credits || 0);
+          localStorage.setItem("dealbotCredits", String(dealbotCredits));
+        }
+        items.length = 0;
+        for (const row of rows || []) items.push(rowToItem(row));
+        nextId = items.reduce((max, it) => Math.max(max, Number(it.id) || 0), 0) + 1;
+        updateUserChip();
+        updateCredits();
+        renderApp();
+        if (!wasSignedIn) {
+          showToast(`Welcome back, ${displayName()}`);
+        }
+        // Drop the login wall and close the modal.
+        document.body.classList.remove("auth-required");
+        closeAuthModalForced();
+      } else {
+        // No user: clear any local items and put the login wall up.
+        auth.profile = null;
+        items.length = 0;
+        nextId = 1;
+        updateUserChip();
+        renderApp();
+        document.body.classList.add("auth-required");
+        openAuthModalLocked();
+        if (wasSignedIn) showToast("Signed out");
+      }
+    }
+
+    function displayName() {
+      return (auth.profile?.display_name)
+        || (auth.user?.user_metadata?.display_name)
+        || (auth.user?.user_metadata?.full_name)
+        || (auth.user?.email?.split("@")[0])
+        || "Account";
+    }
+
+    function updateUserChip() {
+      if (auth.user) {
+        els.userName.textContent = displayName();
+        els.userEmail.textContent = auth.user.email || "";
+        els.settingsWrap.hidden = false;
+      } else {
+        els.settingsWrap.hidden = true;
+        closeSettingsMenu();
+      }
+    }
+
+    function openSettingsMenu() {
+      els.settingsMenu.hidden = false;
+      els.settingsBtn.setAttribute("aria-expanded", "true");
+    }
+
+    function closeSettingsMenu() {
+      els.settingsMenu.hidden = true;
+      els.settingsBtn.setAttribute("aria-expanded", "false");
+    }
+
+    function rowToItem(row) {
+      return {
+        id: row.id,
+        name: row.name,
+        store: row.store || "",
+        retailer: row.retailer || "",
+        category: row.category || "",
+        description: row.description || "",
+        image: row.image || "",
+        target: Number(row.target) || 0,
+        current: Number(row.current) || 0,
+        original: Number(row.original) || 0,
+        trend: row.trend || "stable",
+        specs: row.specs || [],
+        bestFor: row.best_for || [],
+        watchFor: row.watch_for || [],
+        learnedFacts: row.learned_facts || [],
+        details: row.details || null
+      };
+    }
+
+    function itemToRow(item) {
+      return {
+        id: typeof item.id === "string" ? item.id : undefined, // let DB generate uuid
+        user_id: auth.user.id,
+        name: item.name,
+        store: item.store || null,
+        retailer: item.retailer || null,
+        category: item.category || null,
+        description: item.description || null,
+        image: item.image || null,
+        target: item.target,
+        current: item.current,
+        original: item.original,
+        trend: item.trend || "stable",
+        specs: item.specs || [],
+        best_for: item.bestFor || [],
+        watch_for: item.watchFor || [],
+        learned_facts: item.learnedFacts || [],
+        details: item.details || null
+      };
+    }
+
+    // Persist the entire local items list to Supabase by replacing the user's
+    // rows. Debounced so rapid changes coalesce into one round-trip.
+    function queueItemsSave() {
+      if (!auth.user || !auth.client) return;
+      clearTimeout(auth.saveTimer);
+      auth.saveTimer = setTimeout(async () => {
+        try {
+          await auth.client.from("tracked_items").delete().eq("user_id", auth.user.id);
+          if (items.length) {
+            const rows = items.map(itemToRow).map(({ id: _drop, ...rest }) => rest);
+            const { data, error } = await auth.client.from("tracked_items").insert(rows).select();
+            if (error) throw error;
+            // Replace local ids with the DB-generated uuids so subsequent saves match.
+            for (let i = 0; i < data.length && i < items.length; i++) items[i].id = data[i].id;
+          }
+        } catch (error) {
+          console.error("Items save failed:", error);
+        }
+      }, 600);
+    }
+
+    function queueCreditsSave() {
+      if (!auth.user || !auth.client) return;
+      clearTimeout(auth.saveTimer);
+      auth.saveTimer = setTimeout(async () => {
+        try {
+          await auth.client.from("profiles").update({ dealbot_credits: dealbotCredits, updated_at: new Date().toISOString() }).eq("id", auth.user.id);
+        } catch (error) {
+          console.error("Credits save failed:", error);
+        }
+      }, 600);
+    }
+
+    // Login wall: open the modal without the close button, ignore backdrop clicks.
+    function openAuthModalLocked(mode = "signin") {
+      auth.locked = true;
+      setAuthMode(mode);
+      els.authClose.hidden = true;
+      els.authError.textContent = "";
+      els.authBackdrop.classList.add("show");
+      els.authBackdrop.setAttribute("aria-hidden", "false");
+      setTimeout(() => els.authEmail.focus(), 50);
+    }
+
+    function closeAuthModalForced() {
+      auth.locked = false;
+      els.authBackdrop.classList.remove("show");
+      els.authBackdrop.setAttribute("aria-hidden", "true");
+      els.authForm.reset();
+      els.authError.textContent = "";
+    }
+
+    function setAuthMode(mode) {
+      auth.mode = mode;
+      els.authTabs.forEach(tab => {
+        const active = tab.dataset.authTab === mode;
+        tab.classList.toggle("is-active", active);
+        tab.setAttribute("aria-selected", String(active));
+      });
+      if (mode === "signup") {
+        els.authTitle.textContent = "Create your account";
+        els.authSubtitle.textContent = "Save your tracked items and pick up where you left off.";
+        els.authNameField.hidden = false;
+        els.authPassword.autocomplete = "new-password";
+        els.authSubmit.textContent = "Create account";
+      } else {
+        els.authTitle.textContent = "Sign in to Dealwise";
+        els.authSubtitle.textContent = "Sign in to save your tracked items across devices.";
+        els.authNameField.hidden = true;
+        els.authPassword.autocomplete = "current-password";
+        els.authSubmit.textContent = "Sign in";
+      }
+    }
+
+    // ---- Wire up auth UI events ----
+    els.settingsBtn.addEventListener("click", () => {
+      if (els.settingsMenu.hidden) openSettingsMenu(); else closeSettingsMenu();
+    });
+    document.addEventListener("click", event => {
+      if (els.settingsMenu.hidden) return;
+      if (!els.settingsWrap.contains(event.target)) closeSettingsMenu();
+    });
+    els.signOutBtn.addEventListener("click", async () => {
+      closeSettingsMenu();
+      if (!auth.client) return;
+      await auth.client.auth.signOut();
+    });
+    // The auth modal is a login wall: no close button, no click-outside-to-close.
+    els.authTabs.forEach(tab => tab.addEventListener("click", () => setAuthMode(tab.dataset.authTab)));
+
+    els.authForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!auth.client) {
+        els.authError.textContent = "Auth is not configured.";
+        return;
+      }
+      const email = els.authEmail.value.trim();
+      const password = els.authPassword.value;
+      els.authError.textContent = "";
+      els.authSubmit.disabled = true;
+      const originalLabel = els.authSubmit.textContent;
+      els.authSubmit.textContent = auth.mode === "signup" ? "Creating…" : "Signing in…";
+      try {
+        if (auth.mode === "signup") {
+          const name = els.authName.value.trim();
+          const { data, error } = await auth.client.auth.signUp({
+            email,
+            password,
+            options: { data: { display_name: name || email.split("@")[0] } }
+          });
+          if (error) throw error;
+          if (!data.session) {
+            els.authError.textContent = "Check your email to confirm your account, then sign in.";
+            setAuthMode("signin");
+          }
+        } else {
+          const { error } = await auth.client.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+        }
+      } catch (error) {
+        els.authError.textContent = error.message || "Something went wrong.";
+      } finally {
+        els.authSubmit.disabled = false;
+        els.authSubmit.textContent = originalLabel;
+      }
+    });
+
+    els.authGoogle.addEventListener("click", async () => {
+      if (!auth.client) return;
+      els.authError.textContent = "";
+      try {
+        await auth.client.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo: window.location.origin + window.location.pathname }
+        });
+      } catch (error) {
+        els.authError.textContent = error.message || "Google sign-in failed.";
+      }
+    });
+
+    // Expose hooks the rest of the app uses.
+    window.dealwiseAuth = { queueItemsSave, queueCreditsSave, getUser: () => auth.user };
+
+    bootAuth();
   </script>
 </body>
 </html>

@@ -1,9 +1,39 @@
 const http = require("node:http");
+const https = require("node:https");
 const fs = require("node:fs/promises");
+const fsSync = require("node:fs");
 const path = require("node:path");
+
+// Minimal .env loader (no dependency): populate process.env from a local .env file.
+function loadEnv() {
+  try {
+    const raw = fsSync.readFileSync(path.join(__dirname, ".env"), "utf8");
+    for (const line of raw.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eq = trimmed.indexOf("=");
+      if (eq === -1) continue;
+      const key = trimmed.slice(0, eq).trim();
+      let value = trimmed.slice(eq + 1).trim();
+      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+        value = value.slice(1, -1);
+      }
+      if (!(key in process.env)) process.env[key] = value;
+    }
+  } catch {
+    // No .env file is fine; we fall back to built-in suggestions.
+  }
+}
+loadEnv();
 
 const PORT = Number(process.env.PORT || 4173);
 const ROOT = __dirname;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
+const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+const SUPABASE_URL = process.env.SUPABASE_URL || "";
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
 
 const productImages = {
   sony: "https://www.sony.com/image/1faff1a8d2f9b518cb2ef53f2c1d5af3?fmt=png-alpha&wid=960",
@@ -323,10 +353,207 @@ function productSummary(product) {
   };
 }
 
+// Build a relevant product photo URL from a name/keywords using Bing's public
+// thumbnail endpoint, which returns an actual image matching the query.
+function productImageUrl(keywords) {
+  const q = String(keywords || "product").trim().slice(0, 80);
+  return `https://tse.mm.bing.net/th?q=${encodeURIComponent(q)}&w=400&h=400&c=7`;
+}
+
+function geminiGenerate(prompt) {
+  return new Promise((resolve, reject) => {
+    if (!GEMINI_API_KEY) {
+      reject(new Error("No GEMINI_API_KEY configured"));
+      return;
+    }
+    const body = JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.4, responseMimeType: "application/json" }
+    });
+    const options = {
+      method: "POST",
+      hostname: "generativelanguage.googleapis.com",
+      path: `/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`,
+      headers: { "content-type": "application/json", "content-length": Buffer.byteLength(body) }
+    };
+    const request = https.request(options, response => {
+      let data = "";
+      response.on("data", chunk => { data += chunk; });
+      response.on("end", () => {
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          reject(new Error(`Gemini HTTP ${response.statusCode}: ${data.slice(0, 200)}`));
+          return;
+        }
+        try {
+          const parsed = JSON.parse(data);
+          const text = parsed?.candidates?.[0]?.content?.parts?.map(p => p.text).join("") || "";
+          resolve(text);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+    request.on("error", reject);
+    request.setTimeout(12000, () => request.destroy(new Error("Gemini request timed out")));
+    request.write(body);
+    request.end();
+  });
+}
+
+function groqGenerate(prompt) {
+  return new Promise((resolve, reject) => {
+    if (!GROQ_API_KEY) {
+      reject(new Error("No GROQ_API_KEY configured"));
+      return;
+    }
+    const body = JSON.stringify({
+      model: GROQ_MODEL,
+      temperature: 0.4,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: "You are a shopping assistant. Reply with only valid JSON matching the user's requested schema." },
+        { role: "user", content: prompt }
+      ]
+    });
+    const options = {
+      method: "POST",
+      hostname: "api.groq.com",
+      path: "/openai/v1/chat/completions",
+      headers: {
+        "content-type": "application/json",
+        "content-length": Buffer.byteLength(body),
+        authorization: `Bearer ${GROQ_API_KEY}`
+      }
+    };
+    const request = https.request(options, response => {
+      let data = "";
+      response.on("data", chunk => { data += chunk; });
+      response.on("end", () => {
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          reject(new Error(`Groq HTTP ${response.statusCode}: ${data.slice(0, 200)}`));
+          return;
+        }
+        try {
+          const parsed = JSON.parse(data);
+          const text = parsed?.choices?.[0]?.message?.content || "";
+          resolve(text);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+    request.on("error", reject);
+    request.setTimeout(12000, () => request.destroy(new Error("Groq request timed out")));
+    request.write(body);
+    request.end();
+  });
+}
+
+function buildSuggestionPrompt(query, target, store, pref) {
+  // "store" here is a fulfillment preference: In-store / Out-of-store / Delivery / Pick up.
+  let storeLine;
+  switch ((store || "").toLowerCase()) {
+    case "in-store":
+      storeLine = "The shopper wants to buy in-store, so favor products widely stocked at physical retail chains (Target, Best Buy, Walmart, Costco).";
+      break;
+    case "delivery":
+      storeLine = "The shopper wants delivery, so favor products eligible for fast home delivery from major online retailers (Amazon Prime, Walmart, Target delivery).";
+      break;
+    case "pick up":
+    case "pickup":
+      storeLine = "The shopper wants in-store pickup, so favor products available for same-day or next-day pickup at chains like Best Buy, Target, Walmart, Home Depot.";
+      break;
+    default:
+      storeLine = "The shopper has no fulfillment preference.";
+  }
+
+  let prefLine;
+  if (pref === "quality") {
+    prefLine = `The shopper prioritizes QUALITY over price: suggest higher-end, well-reviewed, premium models from reputable brands, even if they cost more. Order them from highest quality to lowest.`;
+  } else if (pref === "custom" && target > 0) {
+    prefLine = `The shopper set a target price of about $${target}. Suggest products whose "current" price is near or below $${target} where realistic, and order them cheapest first.`;
+  } else {
+    prefLine = `The shopper prioritizes the CHEAPEST good options: suggest budget-friendly, value-for-money products with the lowest realistic prices. Order them cheapest first.`;
+  }
+
+  return `You are a shopping assistant for a price-tracking app. A shopper typed this item to track: "${query}".
+${storeLine}
+${prefLine}
+
+Return EXACTLY 4 realistic possible product matches a shopper might want to track for that query, across major US retailers (Amazon, Best Buy, Walmart, Target, eBay). Use real, plausible product/model names — not generic placeholders.
+
+Respond ONLY with a JSON object of the form { "suggestions": [ ...4 items... ] } where each item is shaped exactly like:
+{
+  "name": "specific product name",
+  "store": "one of Amazon, Best Buy, Walmart, Target, eBay",
+  "current": <integer current price in USD>,
+  "original": <integer list/original price in USD, >= current>,
+  "category": "short product category label",
+  "description": "one sentence about the product",
+  "imageKeywords": "2-5 word search phrase that best finds a photo of this exact product, e.g. brand + model",
+  "bestFor": ["short phrase", "short phrase"],
+  "watchFor": ["short caution", "short caution"]
+}
+Do not include any text outside the JSON.`;
+}
+
+function parseSuggestionItems(text) {
+  // Accept either { suggestions: [...] } or a bare [...] array, with optional surrounding prose.
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    const arr = text.match(/\[[\s\S]*\]/);
+    const obj = text.match(/\{[\s\S]*\}/);
+    if (arr) parsed = JSON.parse(arr[0]);
+    else if (obj) parsed = JSON.parse(obj[0]);
+    else throw new Error("LLM returned no JSON");
+  }
+  if (Array.isArray(parsed)) return parsed;
+  if (parsed && Array.isArray(parsed.suggestions)) return parsed.suggestions;
+  throw new Error("LLM JSON had no suggestions array");
+}
+
+function normalizeSuggestions(items, query, target, store) {
+  return items.slice(0, 4).map(item => {
+    const current = Math.max(1, Math.round(Number(item.current) || target || 100));
+    const original = Math.max(current, Math.round(Number(item.original) || Math.round(current * 1.2)));
+    const name = String(item.name || query).slice(0, 90);
+    return {
+      name,
+      store: store || String(item.store || ""),
+      target: target > 0 ? target : current,
+      current,
+      original,
+      trend: "stable",
+      image: productImageUrl(item.imageKeywords || name),
+      category: String(item.category || "Suggested product"),
+      description: String(item.description || `${query} match suggested by Dealwise.`),
+      specs: Array.isArray(item.specs) ? item.specs.slice(0, 6).map(String) : [],
+      bestFor: Array.isArray(item.bestFor) ? item.bestFor.slice(0, 4).map(String) : [],
+      watchFor: Array.isArray(item.watchFor)
+        ? item.watchFor.slice(0, 4).map(String)
+        : ["Confirm the exact model, seller, condition, and return policy before buying"],
+      learnedFacts: []
+    };
+  }).filter(item => item.name);
+}
+
+async function geminiSuggestions(query, target, store, pref = "cheapest") {
+  const text = await geminiGenerate(buildSuggestionPrompt(query, target, store, pref));
+  return normalizeSuggestions(parseSuggestionItems(text), query, target, store);
+}
+
+async function groqSuggestions(query, target, store, pref = "cheapest") {
+  const text = await groqGenerate(buildSuggestionPrompt(query, target, store, pref));
+  return normalizeSuggestions(parseSuggestionItems(text), query, target, store);
+}
+
 async function handleSuggest(req, res, url) {
   const query = url.searchParams.get("q") || "";
   const target = Number(url.searchParams.get("target") || 0);
   const store = url.searchParams.get("store") || "";
+  const pref = url.searchParams.get("pref") || "cheapest";
   const matches = findProducts(query);
   const offers = storeOffersForQuery(query, target, store);
 
@@ -337,6 +564,38 @@ async function handleSuggest(req, res, url) {
       suggestions: offers
     });
     return;
+  }
+
+  if (GEMINI_API_KEY) {
+    try {
+      const geminiResults = await geminiSuggestions(query, target, store, pref);
+      if (geminiResults.length) {
+        sendJson(res, 200, {
+          query,
+          source: "gemini",
+          suggestions: geminiResults
+        });
+        return;
+      }
+    } catch (error) {
+      console.error("Gemini suggest failed, falling back:", error.message);
+    }
+  }
+
+  if (GROQ_API_KEY) {
+    try {
+      const groqResults = await groqSuggestions(query, target, store, pref);
+      if (groqResults.length) {
+        sendJson(res, 200, {
+          query,
+          source: "groq",
+          suggestions: groqResults
+        });
+        return;
+      }
+    } catch (error) {
+      console.error("Groq suggest failed, falling back:", error.message);
+    }
   }
 
   const lookup = await googleLookup(`${query} product`);
@@ -464,53 +723,148 @@ function money(value) {
   }).format(Number(value || 0));
 }
 
-async function handleDealbot(req, res) {
-  let body = "";
-  req.on("data", chunk => {
-    body += chunk;
-    if (body.length > 1_000_000) req.destroy();
-  });
-  req.on("end", async () => {
-    try {
-      const payload = JSON.parse(body || "{}");
-      const question = String(payload.question || "").trim();
-      const products = Array.isArray(payload.products) ? payload.products : [];
-      const activeProductName = payload.activeProductName || "";
-      const turn = Number(payload.turn || 0);
-      const product = products.find(item => normalize(item.name) === normalize(activeProductName)) ||
-        findProducts(activeProductName, products)[0] ||
-        (activeProductName ? null : products[0]) ||
-        productCatalog[0];
-      if (!product) {
-        sendJson(res, 400, { error: "Open or select a product before asking Dealbot." });
-        return;
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    req.on("data", chunk => {
+      body += chunk;
+      if (body.length > 1_000_000) {
+        reject(new Error("Body too large"));
+        req.destroy();
       }
-      const intent = classifyQuestion(question);
-      const lookupQuery = `${product.name} ${intent === "review" ? "reviews ratings complaints" : question}`.trim();
-      const lookup = await googleLookup(lookupQuery);
-      const webFact = lookup.results[0]?.snippet || lookup.results[0]?.title || "";
-      const baseAnswer = answerFromProduct(question, product, { turn, googleUrl: lookup.sourceUrl });
-      const learned = webFact
-        ? `Web note: ${webFact}`
-        : "No clean live snippet came back, so I answered from the saved product database.";
-      const fact = {
-        text: webFact || baseAnswer,
-        source: webFact ? "Google lookup" : "Dealwise database",
-        savedAt: new Date().toISOString()
-      };
-      const currentFacts = learnedFacts.get(product.name) || [];
-      learnedFacts.set(product.name, [...currentFacts, fact].slice(-8));
-
-      sendJson(res, 200, {
-        answer: `${baseAnswer} ${learned}`,
-        productName: product.name,
-        learnedFact: fact,
-        googleUrl: lookup.sourceUrl
-      });
-    } catch (error) {
-      sendJson(res, 400, { error: "Dealbot could not read that question." });
-    }
+    });
+    req.on("end", () => {
+      try { resolve(body ? JSON.parse(body) : {}); }
+      catch (error) { reject(error); }
+    });
+    req.on("error", reject);
   });
+}
+
+async function handleDealbot(req, res) {
+  try {
+    const payload = await readJsonBody(req);
+    const question = String(payload.question || "").trim();
+    if (!question) {
+      sendJson(res, 400, { error: "Ask Dealbot a question." });
+      return;
+    }
+    const watchlist = Array.isArray(payload.watchlist) ? payload.watchlist : [];
+    const activeProductName = String(payload.activeProductName || "").trim();
+
+    // Build a compact watchlist context for the LLM.
+    const watchlistContext = watchlist.length
+      ? watchlist.map((item, idx) => {
+          const detail = item.details || {};
+          const parts = [
+            `${idx + 1}. id=${item.id}`,
+            `name="${item.name}"`,
+            item.retailer ? `retailer=${item.retailer}` : null,
+            item.store ? `fulfillment=${item.store}` : null,
+            `current=$${item.current}`,
+            `target=$${item.target}`,
+            `original=$${item.original}`,
+            item.trend ? `trend=${item.trend}` : null,
+            detail.description ? `desc="${String(detail.description).slice(0, 200)}"` : null,
+            detail.review_summary ? `reviews="${String(detail.review_summary).slice(0, 240)}"` : null,
+            Array.isArray(detail.pros) && detail.pros.length ? `pros=${detail.pros.slice(0, 4).join("; ")}` : null,
+            Array.isArray(detail.cons) && detail.cons.length ? `cons=${detail.cons.slice(0, 4).join("; ")}` : null
+          ].filter(Boolean);
+          return parts.join(" | ");
+        }).join("\n")
+      : "(The user's watchlist is empty.)";
+
+    const systemPrompt = `You are Dealbot, a shopping assistant inside a price-tracking web app called Dealwise.
+The user's tracked items (with their cached details where available) are listed below. Each line is one item.
+
+${watchlistContext}
+
+Rules:
+- If the question references an item that fuzzy-matches one of these by name, brand, or category (e.g. "hoop" -> "Spalding Mini Hoop"), answer about THAT item using its details and prices.
+- ${activeProductName ? `The user currently has "${activeProductName}" open. Prefer that unless the question clearly refers to a different tracked item.` : "No item is currently open."}
+- If no item matches, say so briefly and offer to track one.
+- Be concise (1-3 short paragraphs). Reference real prices/targets from the list when relevant.
+- Reply with ONLY this JSON shape, no prose outside it:
+{
+  "answer": "your reply text",
+  "matchedItemId": "<id from the list above, or null if none>"
+}`;
+
+    let answer = "";
+    let matchedItemId = null;
+
+    if (GROQ_API_KEY) {
+      try {
+        const raw = await groqGenerate(systemPrompt + "\n\nUser question: " + question);
+        const parsed = JSON.parse(raw);
+        answer = String(parsed.answer || "").trim();
+        matchedItemId = parsed.matchedItemId || null;
+      } catch (error) {
+        console.error("Dealbot Groq call failed:", error.message);
+      }
+    }
+
+    if (!answer) {
+      answer = "Dealbot is unavailable right now. Try again in a moment.";
+    }
+
+    sendJson(res, 200, { answer, matchedItemId });
+  } catch (error) {
+    sendJson(res, 400, { error: "Dealbot could not read that question." });
+  }
+}
+
+async function handleProductDetails(req, res) {
+  try {
+    const payload = await readJsonBody(req);
+    const name = String(payload.name || "").trim();
+    const retailer = String(payload.retailer || "").trim();
+    if (!name) {
+      sendJson(res, 400, { error: "Missing product name." });
+      return;
+    }
+    if (!GROQ_API_KEY) {
+      sendJson(res, 503, { error: "Groq API key not configured." });
+      return;
+    }
+
+    const prompt = `You are a shopping research assistant. Write a structured product profile for: "${name}"${retailer ? ` sold at ${retailer}` : ""}.
+
+Respond with ONLY this JSON shape, no prose outside it:
+{
+  "description": "2-3 sentence overview of what the product is and who it's for",
+  "specs": ["short spec or feature", "another", "another", "up to 6"],
+  "pros": ["short pro phrase", "another", "up to 4"],
+  "cons": ["short con phrase", "another", "up to 4"],
+  "review_summary": "1-2 sentence synthesis of typical reviewer sentiment",
+  "rating_estimate": "e.g. 4.3/5 average across major retailers, or 'mixed', or 'no reliable data'"
+}
+Be honest about uncertainty. If the product is obscure or you don't have reliable info, say so in the relevant fields rather than inventing specs.`;
+
+    const text = await groqGenerate(prompt);
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      const m = text.match(/\{[\s\S]*\}/);
+      parsed = m ? JSON.parse(m[0]) : {};
+    }
+
+    const details = {
+      description: String(parsed.description || "").slice(0, 800),
+      specs: Array.isArray(parsed.specs) ? parsed.specs.slice(0, 6).map(s => String(s).slice(0, 120)) : [],
+      pros: Array.isArray(parsed.pros) ? parsed.pros.slice(0, 4).map(s => String(s).slice(0, 120)) : [],
+      cons: Array.isArray(parsed.cons) ? parsed.cons.slice(0, 4).map(s => String(s).slice(0, 120)) : [],
+      review_summary: String(parsed.review_summary || "").slice(0, 600),
+      rating_estimate: String(parsed.rating_estimate || "").slice(0, 80),
+      generated_at: new Date().toISOString()
+    };
+
+    sendJson(res, 200, { details });
+  } catch (error) {
+    console.error("product-details failed:", error.message);
+    sendJson(res, 500, { error: "Could not fetch product details." });
+  }
 }
 
 async function serveStatic(req, res, url) {
@@ -531,7 +885,9 @@ async function serveStatic(req, res, url) {
       ".html": "text/html; charset=utf-8",
       ".js": "text/javascript; charset=utf-8",
       ".css": "text/css; charset=utf-8",
-      ".json": "application/json; charset=utf-8"
+      ".json": "application/json; charset=utf-8",
+      ".svg": "image/svg+xml",
+      ".png": "image/png"
     };
     res.writeHead(200, { "content-type": types[ext] || "application/octet-stream" });
     res.end(data);
@@ -543,8 +899,16 @@ async function serveStatic(req, res, url) {
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+  if (req.method === "GET" && url.pathname === "/api/config") {
+    sendJson(res, 200, { supabaseUrl: SUPABASE_URL, supabaseAnonKey: SUPABASE_ANON_KEY });
+    return;
+  }
   if (req.method === "GET" && url.pathname === "/api/suggest") {
     await handleSuggest(req, res, url);
+    return;
+  }
+  if (req.method === "POST" && url.pathname === "/api/product-details") {
+    await handleProductDetails(req, res);
     return;
   }
   if (req.method === "POST" && url.pathname === "/api/dealbot") {
