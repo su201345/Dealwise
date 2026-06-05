@@ -1,7 +1,6 @@
-# Local dev entrypoint only — don't use as a serverless root on Vercel.
+# Local dev entrypoint -- shipped to the deploy but unused by Vercel.
+# (Vercel sees /api/*.js functions and serves index.html + assets statically.)
 server.js
-
-# Dev/test files not needed in production deploys.
 patch_html.js
 .env
 .env.*
