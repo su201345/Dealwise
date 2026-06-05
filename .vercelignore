@@ -1,0 +1,7 @@
+# Local dev entrypoint only — don't use as a serverless root on Vercel.
+server.js
+
+# Dev/test files not needed in production deploys.
+patch_html.js
+.env
+.env.*
