@@ -331,6 +331,75 @@
       margin-bottom: 18px;
     }
 
+    .more-filters {
+      grid-column: 1 / -1;
+      margin-top: 6px;
+    }
+
+    .more-filters summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 0;
+      user-select: none;
+    }
+
+    .more-filters[open] summary {
+      color: var(--text);
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .filter-field {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .filter-field input,
+    .filter-field select {
+      min-height: 40px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--text);
+    }
+
+    .filter-field-wide {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 980px) {
+      .filter-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .filter-field-wide {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .filter-row {
+        grid-template-columns: 1fr;
+      }
+      .filter-field-wide {
+        grid-column: auto;
+      }
+    }
+
     .add-form {
       display: grid;
       grid-template-columns: minmax(180px, 1.4fr) minmax(260px, 1.2fr) minmax(150px, 1fr) auto;
@@ -622,8 +691,30 @@
     .was-price {
       margin-top: 8px;
       color: var(--muted-2);
-      text-decoration: line-through;
       font-weight: 700;
+    }
+
+    /* The "was $X" portion only gets the strikethrough — the LIVE pill before it stays upright. */
+    .was-price {
+      text-decoration: line-through;
+    }
+
+    .live-tag {
+      display: inline-block;
+      padding: 2px 6px;
+      margin-right: 6px;
+      border-radius: 4px;
+      background: var(--green);
+      color: white;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      vertical-align: middle;
+    }
+
+    .icon-btn.refresh:hover {
+      color: var(--green);
     }
 
     .actions {
@@ -635,12 +726,18 @@
     .icon-btn {
       width: 42px;
       height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
       border: 1px solid var(--border);
       border-radius: 12px;
       background: #FFFEFC;
       color: var(--text);
+      text-decoration: none;
       font-size: 1.05rem;
       font-weight: 800;
+      cursor: pointer;
       transition: transform var(--ease), box-shadow var(--ease), background var(--ease), border-color var(--ease), color var(--ease);
     }
 
@@ -809,9 +906,38 @@
     }
 
     .coupon-expiry {
-      margin: 14px 0 18px;
+      margin: 14px 0 6px;
       color: var(--muted);
       font-size: 0.94rem;
+    }
+
+    .coupon-item {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .coupon-item strong {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .coupon-empty {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      text-align: center;
+      padding: 48px 24px;
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+      background: #FFFEFC;
+      color: var(--muted);
+    }
+
+    .coupon-empty strong {
+      color: var(--text);
+      font-size: 1.1rem;
     }
 
     .code-row {
@@ -1452,6 +1578,92 @@
       color: white;
     }
 
+    .setup-proposal {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: white;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .setup-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.86rem;
+    }
+
+    .setup-head span {
+      color: var(--muted);
+    }
+
+    .setup-items {
+      display: grid;
+      gap: 6px;
+    }
+
+    .setup-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .setup-item-info {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .setup-item-info strong {
+      font-size: 0.86rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .setup-item-info span {
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .setup-add {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--green);
+      font-weight: 800;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .setup-add:hover:not(:disabled) {
+      background: var(--green);
+      color: white;
+    }
+
+    .setup-add:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .setup-add-all {
+      width: 100%;
+      min-height: 40px;
+      font-size: 0.86rem;
+    }
+
+    .setup-add-all:disabled {
+      opacity: 0.7;
+      cursor: default;
+    }
+
     .dealbot-form {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -1724,13 +1936,40 @@
             <label class="field">
               Store
               <select id="store" name="store">
-                <option value="">Select an option</option>
+                <option value="">Any store</option>
                 <option>In-store</option>
                 <option>Delivery</option>
                 <option>Pick up</option>
               </select>
             </label>
             <button class="primary-btn" type="submit">Track it</button>
+            <details class="more-filters" id="moreFilters">
+              <summary>More filters</summary>
+              <div class="filter-row">
+                <label class="filter-field">
+                  Min price
+                  <input id="filterMinPrice" type="number" min="0" step="1" placeholder="$ from">
+                </label>
+                <label class="filter-field">
+                  Max price
+                  <input id="filterMaxPrice" type="number" min="0" step="1" placeholder="$ to">
+                </label>
+                <label class="filter-field">
+                  Item condition
+                  <select id="filterAge">
+                    <option value="">Any</option>
+                    <option>New</option>
+                    <option>Like new</option>
+                    <option>Refurbished</option>
+                    <option>Used</option>
+                  </select>
+                </label>
+                <label class="filter-field filter-field-wide">
+                  Brands (comma-separated)
+                  <input id="filterBrands" type="text" placeholder="e.g. Sony, Bose, Anker">
+                </label>
+              </div>
+            </details>
           </form>
           <div class="suggestions" id="suggestions" aria-live="polite">
             <div class="suggestion-header">
@@ -2052,14 +2291,12 @@
       }
     };
 
-    const coupons = [
-      { code: "MEMDAY25", store: "Amazon", desc: "Extra 25% off select items — Memorial Day sale storewide", expiry: "Expires May 27, 2026", color: "var(--green)" },
-      { code: "TARGET10", store: "Target", desc: "10% off a single purchase in-store or online", expiry: "Expires Jun 1, 2026", color: "var(--amber)" },
-      { code: "BESTBUY5", store: "Best Buy", desc: "$5 off $25+ on accessories and cables", expiry: "Expires Jun 8, 2026", color: "var(--blue)" },
-      { code: "WALMARTPLUS", store: "Walmart", desc: "Free 30-day Walmart+ trial — free shipping on all orders", expiry: "Ongoing", color: "var(--green)" },
-      { code: "EBAY10OFF", store: "eBay", desc: "10% off eligible items for new buyers", expiry: "Expires Jun 30, 2026", color: "var(--amber)" },
-      { code: "RAKUTEN", store: "Any store", desc: "Up to 15% cashback via Rakuten on 3,500+ stores", expiry: "Ongoing", color: "var(--blue)" }
-    ];
+    // Coupons are now Groq-generated per tracked item and cached to Supabase.
+    // Each entry: { code, store, desc, expiry, color, itemName, itemId }.
+    let coupons = [];
+    // Track which item ids we've already loaded coupons for so we don't re-query.
+    const couponsLoadedFor = new Set();
+    let couponsTabLoaded = false;
 
     const alerts = [
       { title: "Sony WH-1000XM5 dropped to $279", subtitle: "Below your $280 target", time: "2h ago", color: "var(--green)" },
@@ -2079,6 +2316,10 @@
       itemNameField: document.querySelector("#itemNameField"),
       itemNameError: document.querySelector("#itemNameError"),
       itemName: document.querySelector("#itemName"),
+      filterMinPrice: document.querySelector("#filterMinPrice"),
+      filterMaxPrice: document.querySelector("#filterMaxPrice"),
+      filterAge: document.querySelector("#filterAge"),
+      filterBrands: document.querySelector("#filterBrands"),
       targetPriceField: document.querySelector("#targetPriceField"),
       targetPriceError: document.querySelector("#targetPriceError"),
       targetPrice: document.querySelector("#targetPrice"),
@@ -2174,9 +2415,14 @@
     // product search results page (NOT a Google search). Falls back to Google
     // shopping for unknown stores.
     function buildStoreProductUrl(item) {
+      // Best case: the LLM provided a direct product detail URL — use it.
+      const direct = String(item?.productUrl || "").trim();
+      if (direct && /^https?:\/\//i.test(direct)) {
+        // Tack on the Amazon affiliate tag if applicable.
+        try { return buildAffiliateUrl(direct); } catch (_) { return direct; }
+      }
       const name = String(item?.name || "").trim();
-      // Prefer the actual retailer (set when the user picks a match), and only
-      // fall back to whatever's in `store` if that's a known retailer name.
+      // Fall back to a retailer's search page if we know the retailer.
       const source = String(item?.retailer || item?.store || "").trim().toLowerCase();
       const q = encodeURIComponent(name);
       switch (source) {
@@ -2340,6 +2586,7 @@
         // build the "open product page" deep link.
         store: getStoreLabel(store),
         retailer: suggestion?.store || "",
+        productUrl: suggestion?.productUrl || "",
         trend,
         image: suggestion?.image || "",
         category: suggestion?.category,
@@ -2349,6 +2596,29 @@
         watchFor: suggestion?.watchFor,
         learnedFacts: suggestion?.learnedFacts || []
       };
+    }
+
+    // Background: hit the server's scraper to get the actual retailer price.
+    // Updates item.livePrice + item.livePriceCheckedAt on success and re-renders.
+    async function refreshLivePrice(item) {
+      if (!item || !item.productUrl) return;
+      try {
+        const response = await fetch("/api/live-price", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ productUrl: item.productUrl })
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (typeof data.price === "number" && data.price > 0) {
+          item.livePrice = data.price;
+          item.livePriceCheckedAt = new Date().toISOString();
+          renderApp();
+          window.dealwiseAuth?.queueItemsSave();
+        }
+      } catch (error) {
+        console.warn("Live price fetch failed for", item.name, error);
+      }
     }
 
     function showToast(message) {
@@ -2408,13 +2678,14 @@
           </div>
           <div class="price-block">
             <div class="current-row">
-              <div class="price display-number">${formatMoney(item.current)}</div>
+              <div class="price display-number">${formatMoney(item.livePrice ?? item.current)}</div>
               <span class="discount">-${discount}%</span>
             </div>
-            <div class="was-price">was ${formatMoney(item.original)}</div>
+            <div class="was-price">${item.livePrice ? `<span class="live-tag" title="Pulled live from ${escapeHtml(item.retailer || "the retailer")}">LIVE</span> ` : ""}was ${formatMoney(item.original)}</div>
           </div>
           <div class="actions">
-            <button class="icon-btn" type="button" aria-label="Open ${escapeHtml(item.retailer || "store")} page for ${escapeHtml(item.name)}" title="Open product page" data-open="${item.id}">↗</button>
+            <button class="icon-btn refresh" type="button" aria-label="Refresh live price for ${escapeHtml(item.name)}" title="Refresh live price" data-refresh="${item.id}">↻</button>
+            <a class="icon-btn" href="${escapeHtml(buildStoreProductUrl(item))}" rel="noopener noreferrer" aria-label="Open ${escapeHtml(item.retailer || "store")} page for ${escapeHtml(item.name)}" title="Open product page (cmd+click for new tab)" data-open="${item.id}">↗</a>
             <button class="icon-btn remove${pendingRemoveId === item.id ? " confirming" : ""}" type="button" aria-label="${pendingRemoveId === item.id ? "Confirm remove" : "Remove"} ${escapeHtml(item.name)}" title="${pendingRemoveId === item.id ? "Confirm remove" : "Remove item"}" data-remove="${item.id}">${pendingRemoveId === item.id ? "Sure?" : "×"}</button>
           </div>
         `;
@@ -2423,17 +2694,91 @@
     }
 
     function renderCoupons() {
+      if (couponsTabLoaded && !items.length) {
+        els.couponGrid.innerHTML = `<div class="coupon-empty"><strong>No tracked items yet.</strong><span>Add items to your watchlist and Dealwise will look up coupons for them.</span></div>`;
+        return;
+      }
+      if (couponsTabLoaded && !coupons.length) {
+        els.couponGrid.innerHTML = `<div class="coupon-empty"><strong>No coupons found.</strong><span>We couldn't find any reliable coupon codes for your tracked items right now. Check back later.</span></div>`;
+        return;
+      }
+      if (!couponsTabLoaded && !coupons.length) {
+        els.couponGrid.innerHTML = `<div class="coupon-empty"><strong>Loading coupons…</strong><span>Searching for promo codes that match your tracked items.</span></div>`;
+        return;
+      }
       els.couponGrid.innerHTML = coupons.map(coupon => `
         <article class="coupon-card" style="--accent: ${coupon.color};">
           <p class="coupon-store">${escapeHtml(coupon.store)}</p>
           <h2 class="coupon-desc">${escapeHtml(coupon.desc)}</h2>
           <p class="coupon-expiry">${escapeHtml(coupon.expiry)}</p>
+          ${coupon.itemName ? `<p class="coupon-item">For: <strong>${escapeHtml(coupon.itemName)}</strong></p>` : ""}
           <div class="code-row">
             <button class="code-box" type="button" data-copy="${escapeHtml(coupon.code)}" aria-label="Copy coupon code ${escapeHtml(coupon.code)}">${escapeHtml(coupon.code)}</button>
             <button class="copy-btn" type="button" data-copy="${escapeHtml(coupon.code)}" aria-label="Copy ${escapeHtml(coupon.code)} coupon code">Copy</button>
           </div>
         </article>
       `).join("");
+    }
+
+    // Pick a rotating accent color for visual variety.
+    const COUPON_COLORS = ["var(--green)", "var(--amber)", "var(--blue)"];
+
+    async function loadCouponsForItem(item) {
+      if (couponsLoadedFor.has(String(item.id))) return [];
+      couponsLoadedFor.add(String(item.id));
+      try {
+        const response = await fetch("/api/item-coupons", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name: item.name, retailer: item.retailer || "", category: item.category || "" })
+        });
+        if (!response.ok) return [];
+        const data = await response.json();
+        const out = (data.coupons || []).map((c, i) => ({
+          code: c.code,
+          store: c.store || item.retailer || "Any store",
+          desc: c.description,
+          expiry: c.expires_on && c.expires_on !== "Unknown" ? `Expires ${c.expires_on}` : (c.expires_on || ""),
+          color: COUPON_COLORS[(coupons.length + i) % COUPON_COLORS.length],
+          itemName: item.name,
+          itemId: item.id
+        }));
+        // Persist to Supabase if signed in.
+        if (out.length) window.dealwiseAuth?.saveItemCoupons?.(item.id, data.coupons || []);
+        return out;
+      } catch (error) {
+        console.error("loadCouponsForItem failed:", error);
+        return [];
+      }
+    }
+
+    async function loadAllCoupons() {
+      if (!items.length) {
+        couponsTabLoaded = true;
+        renderCoupons();
+        return;
+      }
+      // Try to load any cached rows from Supabase first.
+      await window.dealwiseAuth?.loadCachedCoupons?.();
+      renderCoupons();
+      // For items without cached coupons, ask Groq.
+      const needLookup = items.filter(it => !couponsLoadedFor.has(String(it.id)));
+      for (const item of needLookup) {
+        const fresh = await loadCouponsForItem(item);
+        if (fresh.length) {
+          coupons.push(...fresh);
+          renderCoupons();
+        }
+      }
+      couponsTabLoaded = true;
+      renderCoupons();
+    }
+
+    function resetCouponsCache() {
+      // Called when the watchlist changes so the tab will re-query next time.
+      coupons = [];
+      couponsLoadedFor.clear();
+      couponsTabLoaded = false;
     }
 
     function renderAlerts() {
@@ -2504,6 +2849,11 @@
           store: els.store.value,
           pref: pricePref
         });
+        // Optional filters from the "More filters" panel — only sent when set.
+        if (els.filterMinPrice?.value) params.set("min_price", els.filterMinPrice.value);
+        if (els.filterMaxPrice?.value) params.set("max_price", els.filterMaxPrice.value);
+        if (els.filterAge?.value) params.set("age", els.filterAge.value);
+        if (els.filterBrands?.value.trim()) params.set("brands", els.filterBrands.value.trim());
         const response = await fetch(`/api/suggest?${params.toString()}`);
         if (!response.ok) throw new Error("Suggestion lookup failed");
         const data = await response.json();
@@ -2652,6 +3002,88 @@
       els.dealbotLog.scrollTop = els.dealbotLog.scrollHeight;
     }
 
+    // Render a Dealbot-built setup as a confirmable card with per-item and
+    // "Add all" buttons. Nothing is tracked until the user clicks.
+    function renderSetupProposal(setup) {
+      const total = setup.reduce((sum, s) => sum + (Number(s.current) || 0), 0);
+      const card = document.createElement("div");
+      card.className = "setup-proposal";
+      card.innerHTML = `
+        <div class="setup-head">
+          <strong>Suggested setup</strong>
+          <span>${setup.length} items · ${formatMoney(total)}</span>
+        </div>
+        <div class="setup-items">
+          ${setup.map((s, i) => `
+            <div class="setup-item" data-setup-index="${i}">
+              <div class="setup-item-info">
+                <strong>${escapeHtml(s.name)}</strong>
+                <span>${escapeHtml(s.category || "Item")} · ${escapeHtml(getStoreLabel(s.store))} · ${formatMoney(s.current)}</span>
+              </div>
+              <button class="setup-add" type="button" data-setup-add="${i}">Add</button>
+            </div>
+          `).join("")}
+        </div>
+        <button class="setup-add-all primary-btn" type="button" data-setup-add-all>Add all to watchlist</button>
+      `;
+      card._setup = setup;
+      els.dealbotLog.appendChild(card);
+      els.dealbotLog.scrollTop = els.dealbotLog.scrollHeight;
+    }
+
+    function addSetupItemToWatchlist(s) {
+      const item = simulateItem(s.name, Number(s.current) || 0, s.store || "", {
+        name: s.name,
+        store: s.store || "",
+        current: s.current,
+        original: s.original,
+        target: s.current,
+        category: s.category,
+        description: s.description,
+        image: s.image,
+        productUrl: s.productUrl
+      });
+      // simulateItem maps suggestion.store -> retailer; keep store as retailer here too.
+      item.retailer = s.retailer || s.store || item.retailer;
+      items.unshift(item);
+      return item;
+    }
+
+    // Delegate clicks inside the chat log for setup add buttons.
+    els.dealbotLog.addEventListener("click", event => {
+      const card = event.target.closest(".setup-proposal");
+      if (!card || !card._setup) return;
+      const addOne = event.target.closest("[data-setup-add]");
+      const addAll = event.target.closest("[data-setup-add-all]");
+
+      if (addOne) {
+        const idx = Number(addOne.dataset.setupAdd);
+        const s = card._setup[idx];
+        if (s) {
+          addSetupItemToWatchlist(s);
+          addOne.textContent = "Added ✓";
+          addOne.disabled = true;
+          renderApp();
+          window.dealwiseAuth?.queueItemsSave();
+          resetCouponsCache();
+          showToast(`Tracking ${s.name}`);
+        }
+        return;
+      }
+
+      if (addAll) {
+        let added = 0;
+        card._setup.forEach(s => { addSetupItemToWatchlist(s); added++; });
+        card.querySelectorAll("[data-setup-add]").forEach(b => { b.textContent = "Added ✓"; b.disabled = true; });
+        addAll.textContent = `Added ${added} items ✓`;
+        addAll.disabled = true;
+        renderApp();
+        window.dealwiseAuth?.queueItemsSave();
+        resetCouponsCache();
+        showToast(`Added ${added} items to your watchlist`);
+      }
+    });
+
     function classifyQuestion(question) {
       const q = normalize(question);
       if (/\b(specs?|features?|battery|size|dimensions?|waterproof|noise|material|fit)\b/.test(q)) return "specs";
@@ -2757,6 +3189,9 @@
         document.querySelectorAll(".panel").forEach(panel => {
           panel.classList.toggle("active", panel.id === target);
         });
+        if (target === "coupons" && !couponsTabLoaded) {
+          loadAllCoupons();
+        }
       });
     });
 
@@ -2797,6 +3232,9 @@
       showToast(`Tracking ${item.name}`);
       els.itemName.focus();
       window.dealwiseAuth?.queueItemsSave();
+      resetCouponsCache();
+      // Kick off a live-price fetch in the background.
+      refreshLivePrice(item);
     });
 
     els.itemName.addEventListener("input", () => {
@@ -2859,16 +3297,36 @@
     els.watchlistItems.addEventListener("click", event => {
       const openButton = event.target.closest("[data-open]");
       const removeButton = event.target.closest("[data-remove]");
+      const refreshButton = event.target.closest("[data-refresh]");
       const detailCard = event.target.closest("[data-detail]");
 
+      if (refreshButton) {
+        event.stopPropagation();
+        const item = findItemById(refreshButton.dataset.refresh);
+        if (item) {
+          showToast(`Refreshing price for ${item.name}…`);
+          refreshLivePrice(item);
+        }
+        return;
+      }
+
       if (openButton) {
+        // Stop the click from bubbling to the card's open-details handler.
         event.stopPropagation();
         const item = findItemById(openButton.dataset.open);
+        const href = openButton.getAttribute && openButton.getAttribute("href");
+        console.log("[arrow] click", { tag: openButton.tagName, id: openButton.dataset.open, href, item: item ? { name: item.name, retailer: item.retailer, productUrl: item.productUrl } : null });
         if (!item) return;
         const retailerLabel = item.retailer || "product page";
-        const destination = buildStoreProductUrl(item);
-        window.open(destination, "_blank", "noopener");
         showToast(`Opening ${retailerLabel} for ${item.name}`);
+        // If the rendered <a> doesn't carry an href (stale render, etc.), the
+        // browser won't navigate on its own — do it programmatically.
+        if (!href || href === "#") {
+          event.preventDefault();
+          const fallback = buildStoreProductUrl(item);
+          console.log("[arrow] no href, programmatic open:", fallback);
+          if (fallback) window.open(fallback, "_blank", "noopener,noreferrer");
+        }
         return;
       }
 
@@ -2897,6 +3355,7 @@
           }
           renderApp();
           window.dealwiseAuth?.queueItemsSave();
+          resetCouponsCache();
           showToast(`Removed ${removed.name}`);
         }
         return;
@@ -2984,6 +3443,11 @@
         const answer = (data.answer || "").trim() || "Dealbot didn't return an answer.";
         els.dealbotLog.lastElementChild.textContent = answer;
 
+        // If Dealbot built a setup/shopping list, render it with an Add-all action.
+        if (Array.isArray(data.setup) && data.setup.length) {
+          renderSetupProposal(data.setup);
+        }
+
         // If Dealbot identified a tracked item, save the answer as a learned fact on it.
         const matched = items.find(it => String(it.id) === String(data.matchedItemId));
         if (matched) {
@@ -3065,9 +3529,11 @@
         items.length = 0;
         for (const row of rows || []) items.push(rowToItem(row));
         nextId = items.reduce((max, it) => Math.max(max, Number(it.id) || 0), 0) + 1;
+        resetCouponsCache();
         updateUserChip();
         updateCredits();
         renderApp();
+        renderCoupons();
         if (!wasSignedIn) {
           showToast(`Welcome back, ${displayName()}`);
         }
@@ -3079,8 +3545,10 @@
         auth.profile = null;
         items.length = 0;
         nextId = 1;
+        resetCouponsCache();
         updateUserChip();
         renderApp();
+        renderCoupons();
         document.body.classList.add("auth-required");
         openAuthModalLocked();
         if (wasSignedIn) showToast("Signed out");
@@ -3122,6 +3590,9 @@
         name: row.name,
         store: row.store || "",
         retailer: row.retailer || "",
+        productUrl: row.product_url || "",
+        livePrice: row.live_price != null ? Number(row.live_price) : null,
+        livePriceCheckedAt: row.live_price_checked_at || null,
         category: row.category || "",
         description: row.description || "",
         image: row.image || "",
@@ -3144,6 +3615,9 @@
         name: item.name,
         store: item.store || null,
         retailer: item.retailer || null,
+        product_url: item.productUrl || null,
+        live_price: item.livePrice != null ? Math.round(item.livePrice) : null,
+        live_price_checked_at: item.livePriceCheckedAt || null,
         category: item.category || null,
         description: item.description || null,
         image: item.image || null,
@@ -3190,6 +3664,73 @@
           console.error("Credits save failed:", error);
         }
       }, 600);
+    }
+
+    // Persist coupons for a tracked item to Supabase. Replaces any existing
+    // rows for that item so the cache stays in sync with the latest LLM call.
+    async function saveItemCoupons(itemId, couponList) {
+      if (!auth.user || !auth.client || !itemId) return;
+      try {
+        await auth.client.from("item_coupons")
+          .delete()
+          .eq("user_id", auth.user.id)
+          .eq("tracked_item_id", itemId);
+        if (couponList.length) {
+          const rows = couponList.map(c => ({
+            user_id: auth.user.id,
+            tracked_item_id: itemId,
+            code: c.code,
+            description: c.description || null,
+            store: c.store || null,
+            expires_on: c.expires_on || null
+          }));
+          await auth.client.from("item_coupons").insert(rows);
+        }
+      } catch (error) {
+        // Silently no-op if the table doesn't exist yet (user hasn't run the SQL).
+        console.warn("saveItemCoupons skipped:", error.message);
+      }
+    }
+
+    // On Coupons-tab open, hydrate the in-memory list from any rows already
+    // saved for this user's tracked items. Items absent from the cache still
+    // get a live Groq lookup on the same pass.
+    async function loadCachedCoupons() {
+      if (!auth.user || !auth.client || !items.length) return;
+      try {
+        const itemIds = items.map(i => i.id).filter(Boolean);
+        if (!itemIds.length) return;
+        const { data, error } = await auth.client
+          .from("item_coupons")
+          .select("*")
+          .eq("user_id", auth.user.id)
+          .in("tracked_item_id", itemIds);
+        if (error || !data) return;
+        const byItem = new Map();
+        for (const row of data) {
+          const arr = byItem.get(row.tracked_item_id) || [];
+          arr.push(row);
+          byItem.set(row.tracked_item_id, arr);
+        }
+        for (const item of items) {
+          const rows = byItem.get(item.id);
+          if (!rows || !rows.length) continue;
+          couponsLoadedFor.add(String(item.id));
+          rows.forEach((row, i) => {
+            coupons.push({
+              code: row.code,
+              store: row.store || item.retailer || "Any store",
+              desc: row.description || "",
+              expiry: row.expires_on && row.expires_on !== "Unknown" ? `Expires ${row.expires_on}` : (row.expires_on || ""),
+              color: COUPON_COLORS[(coupons.length + i) % COUPON_COLORS.length],
+              itemName: item.name,
+              itemId: item.id
+            });
+          });
+        }
+      } catch (error) {
+        console.warn("loadCachedCoupons skipped:", error.message);
+      }
     }
 
     // Login wall: open the modal without the close button, ignore backdrop clicks.
@@ -3300,7 +3841,7 @@
     });
 
     // Expose hooks the rest of the app uses.
-    window.dealwiseAuth = { queueItemsSave, queueCreditsSave, getUser: () => auth.user };
+    window.dealwiseAuth = { queueItemsSave, queueCreditsSave, saveItemCoupons, loadCachedCoupons, getUser: () => auth.user };
 
     bootAuth();
   </script>

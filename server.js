@@ -360,6 +360,85 @@ function productImageUrl(keywords) {
   return `https://tse.mm.bing.net/th?q=${encodeURIComponent(q)}&w=400&h=400&c=7`;
 }
 
+// HEAD-request a URL with a short timeout, following redirects. Returns true
+// when the final response is a 2xx. Used to filter out hallucinated URLs.
+function verifyUrl(rawUrl, { method = "HEAD", redirects = 3 } = {}) {
+  return new Promise(resolve => {
+    let parsed;
+    try { parsed = new URL(rawUrl); } catch { return resolve(false); }
+    if (!/^https?:$/.test(parsed.protocol)) return resolve(false);
+    const lib = parsed.protocol === "https:" ? https : require("node:http");
+    const req = lib.request({
+      method,
+      hostname: parsed.hostname,
+      path: parsed.pathname + parsed.search,
+      headers: {
+        // Some retailers block requests without a real-looking UA.
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        accept: "text/html,*/*"
+      }
+    }, response => {
+      const code = response.statusCode || 0;
+      response.resume(); // drain
+      // Follow 3xx redirects manually so we can cap the chain.
+      if (code >= 300 && code < 400 && response.headers.location && redirects > 0) {
+        const next = new URL(response.headers.location, parsed).toString();
+        resolve(verifyUrl(next, { method, redirects: redirects - 1 }));
+        return;
+      }
+      // Some retailers (Walmart, Target) return 405 for HEAD or 4xx with a
+      // valid product page — retry once with GET before giving up.
+      if (method === "HEAD" && (code === 405 || code === 403)) {
+        resolve(verifyUrl(rawUrl, { method: "GET", redirects }));
+        return;
+      }
+      resolve(code >= 200 && code < 400);
+    });
+    req.on("error", () => resolve(false));
+    req.setTimeout(4000, () => { req.destroy(); resolve(false); });
+    req.end();
+  });
+}
+
+// Retailer search-URL builder used as a fallback when Groq's productUrl
+// can't be verified. Adds fulfillment-specific query params where useful
+// so the user lands on a pickup/in-store-aware view.
+function retailerSearchUrl(retailer, name, store) {
+  const q = encodeURIComponent(name);
+  const fulfill = (store || "").trim().toLowerCase();
+  switch ((retailer || "").trim().toLowerCase()) {
+    case "amazon":
+      // Amazon doesn't expose pickup filters in their search URL.
+      return `https://www.amazon.com/s?k=${q}`;
+    case "best buy":
+    case "bestbuy": {
+      let base = `https://www.bestbuy.com/site/searchpage.jsp?st=${q}`;
+      if (fulfill === "pick up" || fulfill === "pickup" || fulfill === "in-store") base += "&qp=availability_facet%3DAvailability~Store%20Pickup";
+      return base;
+    }
+    case "walmart": {
+      let base = `https://www.walmart.com/search?q=${q}`;
+      if (fulfill === "pick up" || fulfill === "pickup") base += "&facet=fulfillment_method_in_store%3APickup";
+      else if (fulfill === "delivery") base += "&facet=fulfillment_method_in_store%3ADelivery";
+      else if (fulfill === "in-store") base += "&facet=fulfillment_method_in_store%3AIn-store";
+      return base;
+    }
+    case "target": {
+      let base = `https://www.target.com/s?searchTerm=${q}`;
+      if (fulfill === "pick up" || fulfill === "pickup" || fulfill === "in-store") base += "&facetedValue=5y9p3";
+      else if (fulfill === "delivery") base += "&facetedValue=5y9p2";
+      return base;
+    }
+    case "ebay":
+      return `https://www.ebay.com/sch/i.html?_nkw=${q}`;
+    case "costco":
+      return `https://www.costco.com/CatalogSearch?keyword=${q}`;
+    default:
+      // No retailer hint -> search the most universal one.
+      return `https://www.google.com/search?q=${q}`;
+  }
+}
+
 function geminiGenerate(prompt) {
   return new Promise((resolve, reject) => {
     if (!GEMINI_API_KEY) {
@@ -449,7 +528,7 @@ function groqGenerate(prompt) {
   });
 }
 
-function buildSuggestionPrompt(query, target, store, pref) {
+function buildSuggestionPrompt(query, target, store, pref, filters = {}) {
   // "store" here is a fulfillment preference: In-store / Out-of-store / Delivery / Pick up.
   let storeLine;
   switch ((store || "").toLowerCase()) {
@@ -476,10 +555,17 @@ function buildSuggestionPrompt(query, target, store, pref) {
     prefLine = `The shopper prioritizes the CHEAPEST good options: suggest budget-friendly, value-for-money products with the lowest realistic prices. Order them cheapest first.`;
   }
 
+  const filterLines = [];
+  if (filters.minPrice > 0) filterLines.push(`- The "current" price must be at least $${filters.minPrice}.`);
+  if (filters.maxPrice > 0) filterLines.push(`- The "current" price must be at most $${filters.maxPrice}.`);
+  if (filters.age) filterLines.push(`- Item condition preference: ${filters.age}. Prefer products explicitly available in that condition.`);
+  if (filters.brands && filters.brands.length) filterLines.push(`- Only suggest items from these brands: ${filters.brands.join(", ")}.`);
+  const filterBlock = filterLines.length ? `\nHARD FILTERS (do not violate):\n${filterLines.join("\n")}\n` : "";
+
   return `You are a shopping assistant for a price-tracking app. A shopper typed this item to track: "${query}".
 ${storeLine}
 ${prefLine}
-
+${filterBlock}
 Return EXACTLY 4 realistic possible product matches a shopper might want to track for that query, across major US retailers (Amazon, Best Buy, Walmart, Target, eBay). Use real, plausible product/model names — not generic placeholders.
 
 Respond ONLY with a JSON object of the form { "suggestions": [ ...4 items... ] } where each item is shaped exactly like:
@@ -491,6 +577,7 @@ Respond ONLY with a JSON object of the form { "suggestions": [ ...4 items... ] }
   "category": "short product category label",
   "description": "one sentence about the product",
   "imageKeywords": "2-5 word search phrase that best finds a photo of this exact product, e.g. brand + model",
+  "productUrl": "REQUIRED: a URL that takes the shopper directly to this product on the chosen retailer. Strongly prefer the retailer's own search URL because direct product IDs are often outdated — that way the link cannot 404. Format: https://www.amazon.com/s?k=<product+name>, https://www.walmart.com/search?q=<product+name>, https://www.target.com/s?searchTerm=<product+name>, https://www.bestbuy.com/site/searchpage.jsp?st=<product+name>, https://www.ebay.com/sch/i.html?_nkw=<product+name>. Only use a direct /dp/, /ip/, /p/, /site/...p, or /itm/ URL if you are highly confident the exact product ID is current. NEVER return a Google Shopping URL.",
   "bestFor": ["short phrase", "short phrase"],
   "watchFor": ["short caution", "short caution"]
 }
@@ -514,14 +601,34 @@ function parseSuggestionItems(text) {
   throw new Error("LLM JSON had no suggestions array");
 }
 
-function normalizeSuggestions(items, query, target, store) {
-  return items.slice(0, 4).map(item => {
+async function normalizeSuggestions(items, query, target, store) {
+  // `store` here is the user's FULFILLMENT preference (Delivery / Pick up / In-store).
+  // Each LLM item's own `store` field is the RETAILER (Amazon / Walmart / ...) — keep them separate.
+  const built = items.slice(0, 4).map(item => {
     const current = Math.max(1, Math.round(Number(item.current) || target || 100));
     const original = Math.max(current, Math.round(Number(item.original) || Math.round(current * 1.2)));
     const name = String(item.name || query).slice(0, 90);
+    // Only accept URLs that parse and look plausible. Throwing into a try/catch
+    // and rejecting bad shapes prevents broken links from reaching the client.
+    let productUrl = "";
+    try {
+      const candidate = String(item.productUrl || "").trim();
+      if (candidate && /^https?:\/\//i.test(candidate)) {
+        const u = new URL(candidate);
+        // Reject Google / generic search URLs — the prompt forbids them, but
+        // the LLM sometimes returns them anyway.
+        const host = u.hostname.toLowerCase();
+        const isSearchEngine = host.endsWith("google.com") || host.endsWith("bing.com") || host.endsWith("duckduckgo.com");
+        if (u.hostname && u.hostname.includes(".") && !isSearchEngine) productUrl = u.toString();
+      }
+    } catch (_) { /* drop malformed */ }
+
     return {
       name,
-      store: store || String(item.store || ""),
+      // `store` field on the suggestion is the RETAILER (used for the arrow URL,
+      // affiliate tagging, etc.). Never overwrite it with the fulfillment value.
+      store: String(item.store || ""),
+      productUrl,
       target: target > 0 ? target : current,
       current,
       original,
@@ -537,16 +644,32 @@ function normalizeSuggestions(items, query, target, store) {
       learnedFacts: []
     };
   }).filter(item => item.name);
+
+  // Verify each Groq URL in parallel. If verification fails (404, timeout,
+  // hallucinated path), fall back to a retailer search URL on the same store
+  // with the user's fulfillment preference applied.
+  await Promise.all(built.map(async item => {
+    const retailer = item.store;
+    const fallback = retailerSearchUrl(retailer, item.name, store);
+    if (!item.productUrl) {
+      item.productUrl = fallback;
+      return;
+    }
+    const ok = await verifyUrl(item.productUrl);
+    if (!ok) item.productUrl = fallback;
+  }));
+
+  return built;
 }
 
-async function geminiSuggestions(query, target, store, pref = "cheapest") {
-  const text = await geminiGenerate(buildSuggestionPrompt(query, target, store, pref));
-  return normalizeSuggestions(parseSuggestionItems(text), query, target, store);
+async function geminiSuggestions(query, target, store, pref = "cheapest", filters = {}) {
+  const text = await geminiGenerate(buildSuggestionPrompt(query, target, store, pref, filters));
+  return await normalizeSuggestions(parseSuggestionItems(text), query, target, store);
 }
 
-async function groqSuggestions(query, target, store, pref = "cheapest") {
-  const text = await groqGenerate(buildSuggestionPrompt(query, target, store, pref));
-  return normalizeSuggestions(parseSuggestionItems(text), query, target, store);
+async function groqSuggestions(query, target, store, pref = "cheapest", filters = {}) {
+  const text = await groqGenerate(buildSuggestionPrompt(query, target, store, pref, filters));
+  return await normalizeSuggestions(parseSuggestionItems(text), query, target, store);
 }
 
 async function handleSuggest(req, res, url) {
@@ -554,78 +677,25 @@ async function handleSuggest(req, res, url) {
   const target = Number(url.searchParams.get("target") || 0);
   const store = url.searchParams.get("store") || "";
   const pref = url.searchParams.get("pref") || "cheapest";
-  const matches = findProducts(query);
-  const offers = storeOffersForQuery(query, target, store);
+  const filters = {
+    minPrice: Number(url.searchParams.get("min_price") || 0),
+    maxPrice: Number(url.searchParams.get("max_price") || 0),
+    age: (url.searchParams.get("age") || "").trim(),
+    brands: (url.searchParams.get("brands") || "").split(",").map(s => s.trim()).filter(Boolean)
+  };
 
-  if (matches.length) {
-    sendJson(res, 200, {
-      query,
-      source: "store-offers",
-      suggestions: offers
-    });
+  if (!GROQ_API_KEY) {
+    sendJson(res, 503, { error: "Groq API key not configured.", suggestions: [] });
     return;
   }
 
-  if (GEMINI_API_KEY) {
-    try {
-      const geminiResults = await geminiSuggestions(query, target, store, pref);
-      if (geminiResults.length) {
-        sendJson(res, 200, {
-          query,
-          source: "gemini",
-          suggestions: geminiResults
-        });
-        return;
-      }
-    } catch (error) {
-      console.error("Gemini suggest failed, falling back:", error.message);
-    }
+  try {
+    const groqResults = await groqSuggestions(query, target, store, pref, filters);
+    sendJson(res, 200, { query, source: "groq", suggestions: groqResults });
+  } catch (error) {
+    console.error("Groq suggest failed:", error.message);
+    sendJson(res, 502, { error: "Match lookup failed.", suggestions: [] });
   }
-
-  if (GROQ_API_KEY) {
-    try {
-      const groqResults = await groqSuggestions(query, target, store, pref);
-      if (groqResults.length) {
-        sendJson(res, 200, {
-          query,
-          source: "groq",
-          suggestions: groqResults
-        });
-        return;
-      }
-    } catch (error) {
-      console.error("Groq suggest failed, falling back:", error.message);
-    }
-  }
-
-  const lookup = await googleLookup(`${query} product`);
-  const googleSuggestions = lookup.results.slice(0, 4).map((result, index) => ({
-    name: result.title.replace(/\s*-\s*.*$/, "").slice(0, 80),
-    store: "",
-    target: 100 + index * 25,
-    current: 115 + index * 25,
-    original: 139 + index * 30,
-    trend: "stable",
-    category: "Google result",
-    description: result.snippet || "Suggested from a Google product lookup. Check the store page before buying.",
-    specs: [],
-    bestFor: [],
-    watchFor: ["Verify the exact model, seller, return policy, and current price before purchase."],
-    sourceUrl: lookup.sourceUrl
-  })).filter(item => item.name);
-
-  const suggestions = offers.map((offer, index) => ({
-    ...offer,
-    description: googleSuggestions[index]?.description || offer.description,
-    sourceUrl: googleSuggestions[index]?.sourceUrl || offer.sourceUrl
-  }));
-
-  sendJson(res, 200, {
-    query,
-    source: googleSuggestions.length ? "google-budget" : "budget-fallback",
-    googleUrl: lookup.sourceUrl,
-    suggestions
-  });
 }
 
 function classifyQuestion(question) {
@@ -779,19 +849,39 @@ The user's tracked items (with their cached details where available) are listed 
 
 ${watchlistContext}
 
-Rules:
+You can do two things:
+
+A) ANSWER A QUESTION about a tracked item.
 - If the question references an item that fuzzy-matches one of these by name, brand, or category (e.g. "hoop" -> "Spalding Mini Hoop"), answer about THAT item using its details and prices.
 - ${activeProductName ? `The user currently has "${activeProductName}" open. Prefer that unless the question clearly refers to a different tracked item.` : "No item is currently open."}
 - If no item matches, say so briefly and offer to track one.
-- Be concise (1-3 short paragraphs). Reference real prices/targets from the list when relevant.
-- Reply with ONLY this JSON shape, no prose outside it:
+
+B) BUILD A SETUP / SHOPPING LIST.
+- If the user asks you to build, assemble, or recommend a SETUP, KIT, LIST, or multiple items for a goal (e.g. "build me a gaming setup under $1500", "what do I need for a home gym", "cheapest desk setup"), return a "setup" array.
+- Each setup entry is one product to track. Honor any budget and preferences (cheapest, best quality, specific brands). Use real, plausible product/model names and realistic US prices. The total of all "current" prices should respect the stated budget if any.
+- Pick a sensible NUMBER of items for the goal (typically 3-8).
+
+Be concise (1-3 short paragraphs of "answer" text). Reference real prices/targets when relevant.
+Reply with ONLY this JSON shape, no prose outside it:
 {
-  "answer": "your reply text",
-  "matchedItemId": "<id from the list above, or null if none>"
-}`;
+  "answer": "your reply text (for a setup, summarize what you put together and the total)",
+  "matchedItemId": "<id from the list above, or null if none>",
+  "setup": [
+    {
+      "name": "specific product name",
+      "store": "one of Amazon, Best Buy, Walmart, Target, eBay",
+      "current": <integer current price in USD>,
+      "original": <integer list price >= current>,
+      "category": "short category label",
+      "description": "one sentence"
+    }
+  ]
+}
+If the user is NOT asking for a setup/list, return "setup": [].`;
 
     let answer = "";
     let matchedItemId = null;
+    let setup = [];
 
     if (GROQ_API_KEY) {
       try {
@@ -799,6 +889,26 @@ Rules:
         const parsed = JSON.parse(raw);
         answer = String(parsed.answer || "").trim();
         matchedItemId = parsed.matchedItemId || null;
+        if (Array.isArray(parsed.setup)) {
+          setup = parsed.setup.slice(0, 10).map(s => {
+            const current = Math.max(1, Math.round(Number(s.current) || 50));
+            const original = Math.max(current, Math.round(Number(s.original) || Math.round(current * 1.2)));
+            const name = String(s.name || "").slice(0, 90);
+            const retailer = String(s.store || "");
+            return {
+              name,
+              store: retailer,                        // retailer for the arrow link
+              retailer,
+              current,
+              original,
+              target: current,
+              category: String(s.category || "Setup item").slice(0, 60),
+              description: String(s.description || "").slice(0, 240),
+              image: productImageUrl(s.imageKeywords || name),
+              productUrl: retailerSearchUrl(retailer, name, "")
+            };
+          }).filter(s => s.name);
+        }
       } catch (error) {
         console.error("Dealbot Groq call failed:", error.message);
       }
@@ -808,7 +918,7 @@ Rules:
       answer = "Dealbot is unavailable right now. Try again in a moment.";
     }
 
-    sendJson(res, 200, { answer, matchedItemId });
+    sendJson(res, 200, { answer, matchedItemId, setup });
   } catch (error) {
     sendJson(res, 400, { error: "Dealbot could not read that question." });
   }
@@ -867,6 +977,176 @@ Be honest about uncertainty. If the product is obscure or you don't have reliabl
   }
 }
 
+// Best-effort live-price scraper. Fetches a retailer page and tries common
+// JSON-LD / OpenGraph / inline price patterns. Returns the first plausible
+// price (in dollars) or null. NOT guaranteed to work on every retailer.
+function fetchHtml(rawUrl, redirects = 5) {
+  return new Promise((resolve, reject) => {
+    let parsed;
+    try { parsed = new URL(rawUrl); } catch { return reject(new Error("bad url")); }
+    if (!/^https?:$/.test(parsed.protocol)) return reject(new Error("non-http"));
+    const lib = parsed.protocol === "https:" ? https : require("node:http");
+    const req = lib.request({
+      method: "GET",
+      hostname: parsed.hostname,
+      path: parsed.pathname + parsed.search,
+      headers: {
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "accept-language": "en-US,en;q=0.9"
+      }
+    }, response => {
+      const code = response.statusCode || 0;
+      if (code >= 300 && code < 400 && response.headers.location && redirects > 0) {
+        const next = new URL(response.headers.location, parsed).toString();
+        response.resume();
+        resolve(fetchHtml(next, redirects - 1));
+        return;
+      }
+      if (code >= 400) {
+        response.resume();
+        reject(new Error(`HTTP ${code}`));
+        return;
+      }
+      let body = "";
+      response.setEncoding("utf8");
+      response.on("data", chunk => {
+        body += chunk;
+        if (body.length > 800_000) { req.destroy(); resolve(body); } // cap at 800KB
+      });
+      response.on("end", () => resolve(body));
+    });
+    req.on("error", reject);
+    req.setTimeout(7000, () => { req.destroy(new Error("timeout")); });
+    req.end();
+  });
+}
+
+function extractPrice(html, hostname) {
+  if (!html) return null;
+  // 1. Try JSON-LD blocks — most reliable when present.
+  const ldMatches = html.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi) || [];
+  for (const block of ldMatches) {
+    const inner = block.replace(/<script[^>]*>|<\/script>/gi, "");
+    try {
+      const data = JSON.parse(inner.trim());
+      const candidates = Array.isArray(data) ? data : [data];
+      for (const c of candidates) {
+        const offers = c?.offers;
+        if (!offers) continue;
+        const offer = Array.isArray(offers) ? offers[0] : offers;
+        const price = Number(offer?.price || offer?.lowPrice || offer?.highPrice);
+        if (price > 0 && price < 100_000) return price;
+      }
+    } catch (_) { /* skip non-JSON LD blocks */ }
+  }
+  // 2. OpenGraph product:price:amount
+  const og = html.match(/<meta\s+property=["']product:price:amount["']\s+content=["']([\d.]+)["']/i);
+  if (og) {
+    const v = Number(og[1]);
+    if (v > 0) return v;
+  }
+  // 3. Retailer-specific patterns.
+  let m;
+  if (/amazon\./i.test(hostname)) {
+    m = html.match(/"priceAmount"\s*:\s*"?([\d.]+)/) || html.match(/<span class="a-offscreen">\s*\$([\d,]+\.\d{2})/);
+  } else if (/walmart\./i.test(hostname)) {
+    m = html.match(/"price"\s*:\s*([\d.]+)/);
+  } else if (/target\./i.test(hostname)) {
+    m = html.match(/"current_retail"\s*:\s*([\d.]+)/);
+  } else if (/bestbuy\./i.test(hostname)) {
+    m = html.match(/"customerPrice"\s*:\s*([\d.]+)/);
+  } else if (/ebay\./i.test(hostname)) {
+    m = html.match(/"price"\s*:\s*"?\$?([\d.]+)/);
+  }
+  if (m) {
+    const v = Number(String(m[1]).replace(/,/g, ""));
+    if (v > 0 && v < 100_000) return v;
+  }
+  return null;
+}
+
+async function handleLivePrice(req, res) {
+  try {
+    const payload = await readJsonBody(req);
+    const productUrl = String(payload.productUrl || "").trim();
+    if (!productUrl) {
+      sendJson(res, 400, { error: "Missing productUrl." });
+      return;
+    }
+    let parsed;
+    try { parsed = new URL(productUrl); } catch { sendJson(res, 400, { error: "Invalid URL." }); return; }
+    const html = await fetchHtml(productUrl);
+    const price = extractPrice(html, parsed.hostname);
+    if (price == null) {
+      sendJson(res, 200, { price: null, source: "scrape-miss" });
+      return;
+    }
+    sendJson(res, 200, { price, source: "scrape" });
+  } catch (error) {
+    console.error("live-price failed:", error.message);
+    sendJson(res, 200, { price: null, source: "scrape-error", error: error.message });
+  }
+}
+
+async function handleItemCoupons(req, res) {
+  try {
+    const payload = await readJsonBody(req);
+    const name = String(payload.name || "").trim();
+    const retailer = String(payload.retailer || "").trim();
+    const category = String(payload.category || "").trim();
+    if (!name) {
+      sendJson(res, 400, { error: "Missing product name." });
+      return;
+    }
+    if (!GROQ_API_KEY) {
+      sendJson(res, 503, { error: "Groq API key not configured." });
+      return;
+    }
+
+    const prompt = `You are a coupon-research assistant. Find currently plausible promo or discount codes that could apply when buying this product:
+
+Product: "${name}"${retailer ? `\nRetailer: ${retailer}` : ""}${category ? `\nCategory: ${category}` : ""}
+
+Be conservative — only suggest codes you have reasonable confidence are real or are common evergreen offers (e.g. brand newsletter signup, student discount, app-only promo, manufacturer promotion). NEVER invent fake-looking random codes. If you don't know of any real applicable coupons, return an empty array.
+
+Respond with ONLY this JSON shape, no prose outside it:
+{
+  "coupons": [
+    {
+      "code": "the code the user types at checkout, e.g. SAVE10 or 'No code needed'",
+      "description": "one short sentence about what it does and any restrictions",
+      "store": "retailer or brand the code is for",
+      "expires_on": "approximate expiry text like 'Dec 31, 2026' or 'Ongoing' or 'Unknown'"
+    }
+  ]
+}
+
+Return 0 to 3 coupons. Quality over quantity. If unsure, return { "coupons": [] }.`;
+
+    const text = await groqGenerate(prompt);
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      const m = text.match(/\{[\s\S]*\}/);
+      parsed = m ? JSON.parse(m[0]) : { coupons: [] };
+    }
+
+    const coupons = Array.isArray(parsed.coupons) ? parsed.coupons.slice(0, 3).map(c => ({
+      code: String(c.code || "").slice(0, 40),
+      description: String(c.description || "").slice(0, 200),
+      store: String(c.store || retailer || "").slice(0, 60),
+      expires_on: String(c.expires_on || "Unknown").slice(0, 40)
+    })).filter(c => c.code) : [];
+
+    sendJson(res, 200, { coupons });
+  } catch (error) {
+    console.error("item-coupons failed:", error.message);
+    sendJson(res, 500, { error: "Could not fetch coupons." });
+  }
+}
+
 async function serveStatic(req, res, url) {
   const pathname = decodeURIComponent(url.pathname === "/" ? "/dealwise.html" : url.pathname);
   const filePath = path.normalize(path.join(ROOT, pathname));
@@ -909,6 +1189,14 @@ const server = http.createServer(async (req, res) => {
   }
   if (req.method === "POST" && url.pathname === "/api/product-details") {
     await handleProductDetails(req, res);
+    return;
+  }
+  if (req.method === "POST" && url.pathname === "/api/item-coupons") {
+    await handleItemCoupons(req, res);
+    return;
+  }
+  if (req.method === "POST" && url.pathname === "/api/live-price") {
+    await handleLivePrice(req, res);
     return;
   }
   if (req.method === "POST" && url.pathname === "/api/dealbot") {
