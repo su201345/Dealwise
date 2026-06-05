@@ -1,0 +1,3849 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dealwise</title>
+  <link rel="icon" href="/assets/dealwise-mark.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F7F5F0;
+      --card: #FFFFFF;
+      --border: #E2DDD5;
+      --text: #1F261F;
+      --muted: #706A60;
+      --muted-2: #9A9388;
+      --green: #1A472A;
+      --green-soft: #E7F0E5;
+      --amber: #C58618;
+      --amber-soft: #FFF3D8;
+      --blue: #2F6FA8;
+      --blue-soft: #E7F0F8;
+      --red: #A64636;
+      --shadow: 0 22px 60px rgba(52, 45, 34, 0.12);
+      --soft-shadow: 0 12px 32px rgba(52, 45, 34, 0.08);
+      --radius: 16px;
+      --ease: 0.18s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(135deg, rgba(26, 71, 42, 0.045), transparent 36%),
+        linear-gradient(315deg, rgba(47, 111, 168, 0.04), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    ::selection {
+      background: rgba(26, 71, 42, 0.16);
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #EFEAE2;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #CFC7BA;
+      border: 2px solid #EFEAE2;
+      border-radius: 999px;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      padding-bottom: 48px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(226, 221, 213, 0.78);
+      background: rgba(247, 245, 240, 0.78);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .nav-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 74px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      display: block;
+    }
+
+    .brand-mark {
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: clamp(1.9rem, 4vw, 2.55rem);
+      line-height: 1;
+      color: var(--green);
+      white-space: nowrap;
+    }
+
+    .beta {
+      border: 1px solid rgba(26, 71, 42, 0.22);
+      background: rgba(26, 71, 42, 0.08);
+      color: var(--green);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px;
+      max-width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 7px 22px rgba(54, 45, 34, 0.05);
+    }
+
+    .tab-btn {
+      position: relative;
+      min-width: 108px;
+      border-radius: 999px;
+      padding: 10px 18px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      transition: color var(--ease), background var(--ease), box-shadow var(--ease), transform var(--ease);
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      background: var(--green);
+      color: white;
+      box-shadow: 0 10px 24px rgba(26, 71, 42, 0.2);
+    }
+
+    .savings-total {
+      justify-self: end;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .savings-total strong {
+      font-family: "DM Serif Display", Georgia, serif;
+      color: var(--green);
+      font-size: 1.75rem;
+      line-height: 1;
+      font-weight: 400;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding-top: 52px;
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+      animation: fadeUp 0.28s ease both;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-header {
+      max-width: 760px;
+      margin-bottom: 30px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--green);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    .display-number {
+      font-family: "DM Serif Display", Georgia, serif;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 5.4vw, 4.8rem);
+      line-height: 1;
+      color: #18201A;
+    }
+
+    .subtitle {
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.8vw, 1.18rem);
+      line-height: 1.65;
+      max-width: 710px;
+    }
+
+    .section-label {
+      margin: 36px 0 14px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .metric-card,
+    .card,
+    .coupon-card,
+    .settings-card,
+    .alert-card {
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: var(--radius);
+    }
+
+    .metric-card {
+      position: relative;
+      overflow: hidden;
+      padding: 22px;
+      min-height: 136px;
+      transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+    }
+
+    .metric-card:hover,
+    .item-card:hover,
+    .coupon-card:hover,
+    .alert-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--soft-shadow);
+      border-color: #D5CEC3;
+    }
+
+    .metric-card::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 5px;
+      background: var(--accent);
+    }
+
+    .metric-label {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      margin-top: 10px;
+      font-size: clamp(2.55rem, 5vw, 4.2rem);
+      line-height: 0.95;
+    }
+
+    .metric-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .add-card {
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .more-filters {
+      grid-column: 1 / -1;
+      margin-top: 6px;
+    }
+
+    .more-filters summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 0;
+      user-select: none;
+    }
+
+    .more-filters[open] summary {
+      color: var(--text);
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .filter-field {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .filter-field input,
+    .filter-field select {
+      min-height: 40px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--text);
+    }
+
+    .filter-field-wide {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 980px) {
+      .filter-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .filter-field-wide {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .filter-row {
+        grid-template-columns: 1fr;
+      }
+      .filter-field-wide {
+        grid-column: auto;
+      }
+    }
+
+    .add-form {
+      display: grid;
+      grid-template-columns: minmax(180px, 1.4fr) minmax(260px, 1.2fr) minmax(150px, 1fr) auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #FFFEFC;
+      color: var(--text);
+      padding: 0 13px;
+      outline: none;
+      transition: border-color var(--ease), box-shadow var(--ease), background var(--ease);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: rgba(26, 71, 42, 0.54);
+      box-shadow: 0 0 0 4px rgba(26, 71, 42, 0.11);
+      background: white;
+    }
+
+    .field.invalid input,
+    .field.invalid select {
+      border-color: var(--red);
+      box-shadow: 0 0 0 4px rgba(166, 70, 54, 0.1);
+    }
+
+    .field-error {
+      min-height: 16px;
+      color: var(--red);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .pref-group {
+      display: flex;
+      gap: 6px;
+      min-height: 48px;
+    }
+
+    .pref-btn {
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 48px;
+      padding: 0 8px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #FFFEFC;
+      color: var(--text);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--ease), background var(--ease), color var(--ease), box-shadow var(--ease);
+    }
+
+    .pref-btn:hover {
+      border-color: rgba(26, 71, 42, 0.4);
+    }
+
+    .pref-btn.is-active {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+      box-shadow: 0 6px 16px rgba(26, 71, 42, 0.18);
+    }
+
+    .primary-btn {
+      min-height: 48px;
+      border-radius: 12px;
+      padding: 0 18px;
+      background: var(--green);
+      color: white;
+      font-weight: 800;
+      transition: transform var(--ease), box-shadow var(--ease), background var(--ease);
+      white-space: nowrap;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(26, 71, 42, 0.2);
+      background: #123820;
+    }
+
+    .watchlist {
+      display: grid;
+      gap: 14px;
+    }
+
+    .item-card {
+      display: grid;
+      grid-template-columns: 86px minmax(0, 1.25fr) minmax(180px, 0.95fr) auto;
+      gap: 18px;
+      align-items: center;
+      padding: 18px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: var(--radius);
+      animation: itemIn 0.32s ease both;
+      transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+    }
+
+    @keyframes itemIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .product-media {
+      width: 86px;
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+
+    .product-media img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 14px rgba(31, 38, 31, 0.1));
+      transition: transform var(--ease), filter var(--ease);
+    }
+
+    .item-card:hover .product-media img {
+      transform: scale(1.035);
+      filter: drop-shadow(0 12px 18px rgba(31, 38, 31, 0.15));
+    }
+
+    .product-fallback {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--green);
+      font-weight: 800;
+      background: white;
+    }
+
+    .item-main {
+      min-width: 0;
+    }
+
+    .item-title {
+      margin: 0;
+      font-family: "DM Sans", sans-serif;
+      font-size: 1.08rem;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .meta-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 13px;
+    }
+
+    .badge,
+    .trend-pill,
+    .discount {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .badge.buy {
+      background: var(--green);
+      color: white;
+    }
+
+    .badge.almost {
+      background: var(--amber-soft);
+      color: #7B520D;
+    }
+
+    .badge.watch {
+      background: var(--blue-soft);
+      color: #214F78;
+    }
+
+    .trend-pill {
+      background: #F4F0EA;
+      color: var(--muted);
+    }
+
+    .progress-wrap {
+      min-width: 0;
+    }
+
+    .progress-copy {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .progress-track {
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #EFEAE2;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--green);
+      transition: width var(--ease);
+    }
+
+    .price-block {
+      text-align: right;
+      min-width: 128px;
+    }
+
+    .current-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .price {
+      font-size: 2.45rem;
+      line-height: 0.95;
+      color: #18201A;
+    }
+
+    .discount {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .was-price {
+      margin-top: 8px;
+      color: var(--muted-2);
+      font-weight: 700;
+    }
+
+    /* The "was $X" portion only gets the strikethrough — the LIVE pill before it stays upright. */
+    .was-price {
+      text-decoration: line-through;
+    }
+
+    .live-tag {
+      display: inline-block;
+      padding: 2px 6px;
+      margin-right: 6px;
+      border-radius: 4px;
+      background: var(--green);
+      color: white;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      vertical-align: middle;
+    }
+
+    .icon-btn.refresh:hover {
+      color: var(--green);
+    }
+
+    .actions {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #FFFEFC;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform var(--ease), box-shadow var(--ease), background var(--ease), border-color var(--ease), color var(--ease);
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(52, 45, 34, 0.1);
+      border-color: #D0C7BA;
+      background: white;
+    }
+
+    .icon-btn.remove:hover {
+      color: var(--red);
+    }
+
+    .icon-btn.remove.confirming {
+      width: 68px;
+      color: white;
+      background: var(--red);
+      border-color: var(--red);
+      font-size: 0.88rem;
+    }
+
+    .item-card {
+      cursor: pointer;
+    }
+
+    .item-card:focus-within {
+      border-color: rgba(26, 71, 42, 0.42);
+      box-shadow: 0 0 0 4px rgba(26, 71, 42, 0.1);
+    }
+
+    .empty-state {
+      display: none;
+      padding: 44px 20px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed #D7D0C5;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.56);
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+
+    .suggestions {
+      display: none;
+      margin-top: 14px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+
+    .suggestions.show {
+      display: block;
+    }
+
+    .suggestion-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .suggestion-header strong {
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .suggestion-header span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .suggestion-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .suggestion-btn {
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      min-height: 58px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #FFFEFC;
+      padding: 10px 12px;
+      text-align: left;
+      transition: border-color var(--ease), box-shadow var(--ease), transform var(--ease);
+    }
+
+    .suggestion-btn:hover {
+      border-color: rgba(26, 71, 42, 0.38);
+      box-shadow: 0 10px 22px rgba(52, 45, 34, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .suggestion-btn strong,
+    .suggestion-btn span {
+      display: block;
+    }
+
+    .suggestion-btn strong {
+      color: var(--text);
+      font-size: 0.96rem;
+      line-height: 1.2;
+    }
+
+    .suggestion-btn span {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .suggestion-thumb {
+      width: 52px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .suggestion-thumb img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 10px rgba(31, 38, 31, 0.1));
+    }
+
+    .coupon-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .coupon-card {
+      position: relative;
+      overflow: hidden;
+      padding: 22px;
+      border-left: 7px solid var(--accent);
+      transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+    }
+
+    .coupon-store {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .coupon-desc {
+      margin: 0;
+      min-height: 58px;
+      font-size: 1.45rem;
+      line-height: 1.12;
+      font-weight: 800;
+    }
+
+    .coupon-expiry {
+      margin: 14px 0 6px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .coupon-item {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .coupon-item strong {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .coupon-empty {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      text-align: center;
+      padding: 48px 24px;
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+      background: #FFFEFC;
+      color: var(--muted);
+    }
+
+    .coupon-empty strong {
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+
+    .code-row {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .code-box {
+      flex: 1;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed #BEB5A7;
+      border-radius: 12px;
+      background: #FBF8F2;
+      color: var(--text);
+      font-family: "DM Mono", monospace;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      transition: border-color var(--ease), background var(--ease), transform var(--ease);
+    }
+
+    .code-box:hover {
+      border-color: var(--green);
+      background: #F7FBF5;
+      transform: translateY(-1px);
+    }
+
+    .copy-btn {
+      min-height: 44px;
+      border-radius: 12px;
+      padding: 0 14px;
+      background: #F0EBE3;
+      color: var(--text);
+      font-weight: 800;
+      transition: background var(--ease), transform var(--ease);
+    }
+
+    .copy-btn:hover {
+      background: #E7E0D5;
+      transform: translateY(-1px);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .alerts-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .feed {
+      display: grid;
+      gap: 12px;
+    }
+
+    .alert-card {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent), transparent 82%);
+    }
+
+    .alert-title {
+      margin: 0;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .alert-subtitle,
+    .alert-time {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .alert-time {
+      margin: 0;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .settings-card {
+      padding: 20px;
+    }
+
+    .settings-title {
+      margin: 0 0 16px;
+      font-family: "DM Sans", sans-serif;
+      font-size: 1.04rem;
+      font-weight: 800;
+    }
+
+    .setting {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .setting:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .setting-copy strong {
+      display: block;
+      font-size: 0.98rem;
+    }
+
+    .setting-copy span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .switch {
+      position: relative;
+      flex: 0 0 auto;
+      width: 52px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: #D7D0C5;
+      transition: background var(--ease), box-shadow var(--ease);
+    }
+
+    .slider::after {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 2px 8px rgba(52, 45, 34, 0.18);
+      transition: transform var(--ease);
+    }
+
+    .switch input:checked + .slider {
+      background: var(--green);
+    }
+
+    .switch input:focus + .slider {
+      box-shadow: 0 0 0 4px rgba(26, 71, 42, 0.12);
+    }
+
+    .switch input:checked + .slider::after {
+      transform: translateX(22px);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 40;
+      transform: translate(-50%, 20px);
+      opacity: 0;
+      pointer-events: none;
+      max-width: calc(100% - 32px);
+      border-radius: 999px;
+      background: #18201A;
+      color: white;
+      padding: 13px 18px;
+      box-shadow: var(--shadow);
+      font-weight: 800;
+      transition: opacity var(--ease), transform var(--ease);
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 35;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(31, 38, 31, 0.34);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    /* Login wall: hide the whole app until the user is signed in. */
+    body.auth-required .app-shell,
+    body.auth-required .dealbot {
+      visibility: hidden;
+    }
+
+    .settings-wrap {
+      position: relative;
+    }
+
+    .settings-btn {
+      width: 38px;
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #FFFEFC;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color var(--ease), background var(--ease);
+    }
+
+    .settings-btn:hover {
+      border-color: rgba(26, 71, 42, 0.45);
+      background: white;
+    }
+
+    .settings-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 16px 32px rgba(31, 38, 31, 0.18);
+      z-index: 30;
+    }
+
+    .settings-user {
+      display: grid;
+      gap: 2px;
+      padding: 10px 12px 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 6px;
+    }
+
+    .settings-user strong {
+      font-size: 0.92rem;
+      max-width: 240px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .settings-email {
+      color: var(--muted);
+      font-size: 0.78rem;
+      max-width: 240px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .settings-item {
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      background: transparent;
+      border: 0;
+      border-radius: 8px;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background var(--ease);
+    }
+
+    .settings-item:hover {
+      background: #F5F2EC;
+    }
+
+    .auth-modal {
+      width: min(420px, 100%);
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .auth-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .auth-title {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      margin: 0;
+    }
+
+    .auth-subtitle {
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin: 0 0 16px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin: 12px 0;
+      padding: 4px;
+      background: #F5F2EC;
+      border-radius: 12px;
+    }
+
+    .auth-tab {
+      min-height: 36px;
+      background: transparent;
+      border: 0;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background var(--ease), color var(--ease);
+    }
+
+    .auth-tab.is-active {
+      background: white;
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .auth-error {
+      min-height: 16px;
+      color: var(--red);
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .auth-error:empty {
+      display: none;
+    }
+
+    .auth-submit {
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .auth-google {
+      width: 100%;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: background var(--ease), border-color var(--ease);
+    }
+
+    .auth-google:hover {
+      background: #F8F6F1;
+      border-color: rgba(26, 71, 42, 0.4);
+    }
+
+    .detail-modal {
+      width: min(760px, 100%);
+      max-height: min(760px, calc(100vh - 36px));
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .detail-head {
+      display: grid;
+      grid-template-columns: 104px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: start;
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-head .product-media {
+      width: 104px;
+      height: 92px;
+    }
+
+    .detail-title {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+      line-height: 1;
+    }
+
+    .detail-body {
+      display: grid;
+      gap: 18px;
+      padding: 20px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .detail-stat {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #FFFEFC;
+    }
+
+    .detail-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .detail-stat strong {
+      display: block;
+      margin-top: 6px;
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: 1.55rem;
+      font-weight: 400;
+    }
+
+    .detail-section h3 {
+      margin: 0 0 8px;
+      font-family: "DM Sans", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .detail-section p,
+    .detail-section li {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .detail-section ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .detail-loading {
+      padding: 18px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .detail-rating {
+      padding: 6px 12px;
+      background: #F5F2EC;
+      border-radius: 8px;
+      display: inline-block;
+      margin: 0 0 12px;
+      font-size: 0.9rem;
+    }
+
+    .detail-disclaimer {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-style: italic;
+      margin-top: 14px;
+    }
+
+    .detail-refresh {
+      margin-top: 8px;
+    }
+
+    .dealbot {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 34;
+      width: min(380px, calc(100% - 28px));
+    }
+
+    .dealbot-toggle {
+      float: right;
+      min-height: 52px;
+      border-radius: 999px;
+      padding: 0 18px;
+      background: var(--green);
+      color: white;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+      transition: transform var(--ease), background var(--ease);
+    }
+
+    .dealbot-toggle:hover {
+      transform: translateY(-2px);
+      background: #123820;
+    }
+
+    .dealbot-panel {
+      display: none;
+      clear: both;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .dealbot.open .dealbot-panel {
+      display: block;
+      animation: fadeUp 0.2s ease both;
+    }
+
+    .dealbot.open .dealbot-toggle {
+      display: none;
+    }
+
+    .dealbot-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 14px 12px;
+      border-bottom: 1px solid var(--border);
+      background: #FBF8F2;
+    }
+
+    .dealbot-head strong {
+      display: block;
+      color: var(--green);
+      font-size: 1.05rem;
+    }
+
+    .dealbot-head span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .dealbot-log {
+      display: grid;
+      gap: 9px;
+      max-height: 300px;
+      overflow: auto;
+      padding: 14px;
+      background: #FFFEFC;
+    }
+
+    .chat-msg {
+      width: fit-content;
+      max-width: 92%;
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: var(--text);
+      background: #F0EBE3;
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+
+    .chat-msg.user {
+      justify-self: end;
+      background: var(--green);
+      color: white;
+    }
+
+    .setup-proposal {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: white;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .setup-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.86rem;
+    }
+
+    .setup-head span {
+      color: var(--muted);
+    }
+
+    .setup-items {
+      display: grid;
+      gap: 6px;
+    }
+
+    .setup-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .setup-item-info {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .setup-item-info strong {
+      font-size: 0.86rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .setup-item-info span {
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .setup-add {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--green);
+      font-weight: 800;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .setup-add:hover:not(:disabled) {
+      background: var(--green);
+      color: white;
+    }
+
+    .setup-add:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .setup-add-all {
+      width: 100%;
+      min-height: 40px;
+      font-size: 0.86rem;
+    }
+
+    .setup-add-all:disabled {
+      opacity: 0.7;
+      cursor: default;
+    }
+
+    .dealbot-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .dealbot-form input {
+      min-height: 42px;
+    }
+
+    .dealbot-form button {
+      min-height: 42px;
+      border-radius: 12px;
+      padding: 0 14px;
+      background: var(--green);
+      color: white;
+      font-weight: 800;
+    }
+
+    @media (max-width: 980px) {
+      .nav-inner {
+        grid-template-columns: 1fr;
+        justify-items: stretch;
+        padding: 14px 0;
+      }
+
+      .tabs {
+        justify-content: center;
+        overflow-x: auto;
+      }
+
+      .savings-total {
+        justify-self: start;
+      }
+
+      main {
+        padding-top: 34px;
+      }
+
+      .metrics,
+      .coupon-grid,
+      .alerts-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .add-form {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      #targetPriceField {
+        grid-column: span 2;
+      }
+
+      .primary-btn {
+        grid-column: span 2;
+      }
+
+      .item-card {
+        grid-template-columns: 78px minmax(0, 1fr);
+      }
+
+      .progress-wrap,
+      .price-block,
+      .actions {
+        grid-column: 1 / -1;
+      }
+
+      .price-block {
+        text-align: left;
+      }
+
+      .current-row {
+        justify-content: flex-start;
+      }
+
+      .actions {
+        grid-template-columns: repeat(2, 42px);
+        justify-content: start;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .app-shell {
+        padding-bottom: 30px;
+      }
+
+      .nav-inner,
+      main {
+        width: min(100% - 22px, 1180px);
+      }
+
+      .brand {
+        justify-content: space-between;
+      }
+
+      .tabs {
+        justify-content: flex-start;
+      }
+
+      .tab-btn {
+        min-width: 0;
+        flex: 1 1 0;
+        padding-inline: 10px;
+      }
+
+      h1 {
+        font-size: clamp(2.65rem, 15vw, 4.2rem);
+      }
+
+      form.add-form {
+        grid-template-columns: 1fr;
+      }
+
+      form.add-form > * {
+        grid-column: 1 / -1;
+      }
+
+      .primary-btn {
+        grid-column: auto;
+      }
+
+      .item-card {
+        grid-template-columns: 68px minmax(0, 1fr);
+        gap: 13px;
+        padding: 14px;
+      }
+
+      .product-media {
+        width: 68px;
+        height: 58px;
+      }
+
+      .alert-time {
+        grid-column: 2;
+      }
+
+      .code-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .copy-btn,
+      .code-box {
+        width: 100%;
+      }
+
+      .suggestion-list,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-head {
+        grid-template-columns: 82px minmax(0, 1fr);
+      }
+
+      .detail-head .product-media {
+        width: 82px;
+        height: 72px;
+      }
+
+      .detail-head .icon-btn {
+        grid-column: 1 / -1;
+        justify-self: end;
+      }
+
+      .dealbot {
+        right: 14px;
+        bottom: 14px;
+      }
+
+      .toast {
+        white-space: normal;
+        text-align: center;
+      }
+    }
+  </style>
+  <script type="module">
+    // Load Supabase from CDN as an ES module and expose it globally for the
+    // main inline script (which is a classic script and can't import directly).
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    window.supabaseCreateClient = createClient;
+    window.dispatchEvent(new Event("supabase-sdk-ready"));
+  </script>
+</head>
+<body class="auth-required">
+  <div class="app-shell">
+    <nav class="topbar" aria-label="Primary">
+      <div class="nav-inner">
+        <div class="brand" aria-label="Dealwise">
+          <img class="brand-logo" src="/assets/dealwise-mark.svg" alt="" width="42" height="42">
+          <div class="brand-mark">Dealwise</div>
+          <span class="beta">BETA</span>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Dealwise sections">
+          <button class="tab-btn active" id="tab-watchlist" type="button" role="tab" aria-selected="true" aria-controls="watchlist" data-tab="watchlist">Watchlist</button>
+          <button class="tab-btn" id="tab-coupons" type="button" role="tab" aria-selected="false" aria-controls="coupons" data-tab="coupons">Coupons</button>
+          <button class="tab-btn" id="tab-alerts" type="button" role="tab" aria-selected="false" aria-controls="alerts" data-tab="alerts">Alerts</button>
+        </div>
+
+        <div class="savings-total" aria-live="polite">
+          <strong id="navSavings">$0</strong>
+          <span>saved</span>
+        </div>
+
+        <div class="settings-wrap" id="settingsWrap" hidden>
+          <button class="settings-btn" id="settingsBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+          <div class="settings-menu" id="settingsMenu" role="menu" hidden>
+            <div class="settings-user">
+              <strong id="userName">Account</strong>
+              <span id="userEmail" class="settings-email"></span>
+            </div>
+            <button class="settings-item" id="signOutBtn" type="button" role="menuitem">Log out</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <section id="watchlist" class="panel active" role="tabpanel" aria-labelledby="tab-watchlist">
+        <header class="page-header">
+          <p class="eyebrow">Smart deal tracking</p>
+          <h1>Your wishlist, price-checked.</h1>
+          <p class="subtitle">Track the products you want, compare today&apos;s price to your personal buy point, and let Dealwise surface the moments when waiting turns into saving.</p>
+        </header>
+
+        <div class="metrics" aria-live="polite">
+          <article class="metric-card" style="--accent: var(--green);">
+            <p class="metric-label">Items tracked</p>
+            <div class="metric-value display-number" id="itemsTracked">0</div>
+            <div class="metric-note">Across your online wishlist</div>
+          </article>
+          <article class="metric-card" style="--accent: var(--amber);">
+            <p class="metric-label">Total savings</p>
+            <div class="metric-value display-number" id="totalSavings">$0</div>
+            <div class="metric-note">Compared with original prices</div>
+          </article>
+          <article class="metric-card" style="--accent: var(--blue);">
+            <p class="metric-label">Ready to buy</p>
+            <div class="metric-value display-number" id="readyCount">0</div>
+            <div class="metric-note">At or below your target</div>
+          </article>
+        </div>
+
+        <p class="section-label">Add item</p>
+        <section class="card add-card" aria-label="Add item">
+          <form class="add-form" id="addForm" novalidate>
+            <label class="field" id="itemNameField">
+              Item name
+              <input id="itemName" name="itemName" type="text" placeholder="Air fryer, running shoes..." autocomplete="off" aria-describedby="itemNameError" aria-invalid="false">
+              <span class="field-error" id="itemNameError" aria-live="polite"></span>
+            </label>
+            <div class="field" id="targetPriceField">
+              Price preference
+              <div class="pref-group" role="radiogroup" aria-label="Price preference">
+                <button type="button" class="pref-btn is-active" data-pref="cheapest" role="radio" aria-checked="true">Cheapest</button>
+                <button type="button" class="pref-btn" data-pref="quality" role="radio" aria-checked="false">Best quality</button>
+                <button type="button" class="pref-btn" data-pref="custom" role="radio" aria-checked="false">Set my price</button>
+              </div>
+              <input id="targetPrice" name="targetPrice" type="number" min="1" step="1" placeholder="Your price" aria-describedby="targetPriceError" aria-invalid="false" hidden>
+              <span class="field-error" id="targetPriceError" aria-live="polite"></span>
+            </div>
+            <label class="field">
+              Store
+              <select id="store" name="store">
+                <option value="">Any store</option>
+                <option>In-store</option>
+                <option>Delivery</option>
+                <option>Pick up</option>
+              </select>
+            </label>
+            <button class="primary-btn" type="submit">Track it</button>
+            <details class="more-filters" id="moreFilters">
+              <summary>More filters</summary>
+              <div class="filter-row">
+                <label class="filter-field">
+                  Min price
+                  <input id="filterMinPrice" type="number" min="0" step="1" placeholder="$ from">
+                </label>
+                <label class="filter-field">
+                  Max price
+                  <input id="filterMaxPrice" type="number" min="0" step="1" placeholder="$ to">
+                </label>
+                <label class="filter-field">
+                  Item condition
+                  <select id="filterAge">
+                    <option value="">Any</option>
+                    <option>New</option>
+                    <option>Like new</option>
+                    <option>Refurbished</option>
+                    <option>Used</option>
+                  </select>
+                </label>
+                <label class="filter-field filter-field-wide">
+                  Brands (comma-separated)
+                  <input id="filterBrands" type="text" placeholder="e.g. Sony, Bose, Anker">
+                </label>
+              </div>
+            </details>
+          </form>
+          <div class="suggestions" id="suggestions" aria-live="polite">
+            <div class="suggestion-header">
+              <strong>Possible matches</strong>
+              <span>Choose one or keep your typed item</span>
+            </div>
+            <div class="suggestion-list" id="suggestionList"></div>
+          </div>
+        </section>
+
+        <p class="section-label">Tracked items</p>
+        <section class="watchlist" id="watchlistItems" aria-live="polite"></section>
+        <div class="empty-state" id="emptyState">
+          <strong>No tracked items yet</strong>
+          Add a product above and Dealwise will start watching the price.
+        </div>
+      </section>
+
+      <section id="coupons" class="panel" role="tabpanel" aria-labelledby="tab-coupons">
+        <header class="page-header">
+          <p class="eyebrow">Coupon vault</p>
+          <h1>Codes worth trying first.</h1>
+          <p class="subtitle">A clean stack of currently available promo codes for the stores already showing up in your shopping orbit.</p>
+        </header>
+
+        <div class="coupon-grid" id="couponGrid" aria-label="Available coupons"></div>
+      </section>
+
+      <section id="alerts" class="panel" role="tabpanel" aria-labelledby="tab-alerts">
+        <header class="page-header">
+          <p class="eyebrow">Alerts</p>
+          <h1>Signals, not noise.</h1>
+          <p class="subtitle">See the price moves, coupon drops, and buy-window moments that matter for your watchlist.</p>
+        </header>
+
+        <div class="alerts-layout">
+          <section>
+            <p class="section-label">Recent events</p>
+            <div class="feed" id="alertFeed"></div>
+          </section>
+
+          <section>
+            <p class="section-label">Notification settings</p>
+            <article class="settings-card">
+              <h2 class="settings-title">Delivery preferences</h2>
+              <div class="setting">
+                <div class="setting-copy">
+                  <strong>Price drop alerts</strong>
+                  <span>Notify when tracked prices move down.</span>
+                </div>
+                <label class="switch" aria-label="Price drop alerts">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting">
+                <div class="setting-copy">
+                  <strong>Target price reached</strong>
+                  <span>Ping when an item reaches your buy point.</span>
+                </div>
+                <label class="switch" aria-label="Target price reached">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting">
+                <div class="setting-copy">
+                  <strong>New coupons</strong>
+                  <span>Surface new codes for tracked stores.</span>
+                </div>
+                <label class="switch" aria-label="New coupons">
+                  <input type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting">
+                <div class="setting-copy">
+                  <strong>Weekly price digest</strong>
+                  <span>Send a concise savings recap.</span>
+                </div>
+                <label class="switch" aria-label="Weekly price digest">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </article>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="detailBackdrop" aria-hidden="true">
+    <article class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <header class="detail-head">
+        <div class="product-media" id="detailMedia" aria-hidden="true"></div>
+        <div>
+          <h2 class="detail-title" id="detailTitle">Product details</h2>
+          <p class="meta-line" id="detailMeta"></p>
+        </div>
+        <button class="icon-btn" type="button" id="detailClose" aria-label="Close product details">×</button>
+      </header>
+      <div class="detail-body" id="detailBody"></div>
+    </article>
+  </div>
+
+  <div class="modal-backdrop" id="authBackdrop" aria-hidden="true">
+    <article class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <header class="auth-head">
+        <h2 class="auth-title" id="authTitle">Sign in to Dealwise</h2>
+        <button class="icon-btn" type="button" id="authClose" aria-label="Close sign in" hidden>×</button>
+      </header>
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab is-active" type="button" data-auth-tab="signin" role="tab" aria-selected="true">Sign in</button>
+        <button class="auth-tab" type="button" data-auth-tab="signup" role="tab" aria-selected="false">Sign up</button>
+      </div>
+      <p class="auth-subtitle" id="authSubtitle">Sign in to save your tracked items across devices.</p>
+      <form class="auth-form" id="authForm" novalidate>
+        <label class="field auth-field" id="authNameField" hidden>
+          Display name
+          <input id="authName" name="name" type="text" autocomplete="name" placeholder="Suhas">
+        </label>
+        <label class="field auth-field">
+          Email
+          <input id="authEmail" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+        </label>
+        <label class="field auth-field">
+          Password
+          <input id="authPassword" name="password" type="password" autocomplete="current-password" required minlength="6" placeholder="At least 6 characters">
+        </label>
+        <p class="auth-error" id="authError" role="alert" aria-live="polite"></p>
+        <button class="primary-btn auth-submit" type="submit" id="authSubmit">Sign in</button>
+      </form>
+      <div class="auth-divider"><span>or</span></div>
+      <button class="auth-google" type="button" id="authGoogle">
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <path d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.13-.84 2.08-1.78 2.72v2.26h2.88c1.69-1.55 2.66-3.84 2.66-6.63z" fill="#4285F4"/>
+          <path d="M9 18c2.4 0 4.42-.8 5.9-2.17l-2.88-2.26c-.8.54-1.83.86-3.02.86-2.32 0-4.29-1.57-5-3.67H1.02v2.33C2.5 15.99 5.5 18 9 18z" fill="#34A853"/>
+          <path d="M4 10.76c-.18-.55-.29-1.13-.29-1.76s.11-1.21.29-1.76V4.91H1.02C.37 6.16 0 7.55 0 9s.37 2.84 1.02 4.09L4 10.76z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.32 0 2.5.45 3.42 1.34l2.56-2.56C13.42.89 11.4 0 9 0 5.5 0 2.5 2.01 1.02 4.91L4 7.24C4.71 5.14 6.68 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+    </article>
+  </div>
+
+  <section class="dealbot" id="dealbot" aria-label="Dealbot assistant">
+    <button class="dealbot-toggle" id="dealbotToggle" type="button">Ask Dealbot</button>
+    <div class="dealbot-panel">
+      <div class="dealbot-head">
+        <div>
+          <strong>Dealbot</strong>
+          <span id="dealbotCredits">200 credits left</span>
+        </div>
+        <button class="icon-btn" id="dealbotClose" type="button" aria-label="Close Dealbot">×</button>
+      </div>
+      <div class="dealbot-log" id="dealbotLog" aria-live="polite">
+        <div class="chat-msg">Ask me about a tracked product, specs, timing, coupons, or missing details. I will save useful facts back into this session&apos;s product database.</div>
+      </div>
+      <form class="dealbot-form" id="dealbotForm">
+        <input id="dealbotInput" type="text" placeholder="Ask about any product..." autocomplete="off" aria-label="Ask Dealbot">
+        <button type="submit">Ask</button>
+      </form>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="sr-only" id="srLive" aria-live="polite"></div>
+
+  <script>
+    const productImages = {
+      sony: "https://www.sony.com/image/1faff1a8d2f9b518cb2ef53f2c1d5af3?fmt=png-alpha&wid=960",
+      instantPot: "https://commons.wikimedia.org/wiki/Special:FilePath/Instant%20Pot%20%2849907000991%29.jpg?width=900",
+      kindle: "https://commons.wikimedia.org/wiki/Special:FilePath/2023%20Amazon%20Kindle%20Paperwhite%20%283%29.jpg?width=900",
+      levis: "https://commons.wikimedia.org/wiki/Special:FilePath/Levis%20501%20rear%20detail.jpg?width=900",
+      laptopA: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80",
+      laptopB: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80",
+      laptopC: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80",
+      laptopD: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=800&auto=format&fit=crop&q=80",
+      phone: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80",
+      headphonesBudget: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80",
+      kitchenBudget: "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&auto=format&fit=crop&q=80",
+      clothingBudget: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&auto=format&fit=crop&q=80",
+      shoppingBudget: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&auto=format&fit=crop&q=80"
+    };
+
+    const budgetCatalog = {
+      laptop: [
+        { name: "Acer Aspire 5 Slim", store: "Amazon", target: 420, current: 349, original: 499, image: productImages.laptopA, category: "Budget laptop", description: "A practical Windows laptop option for school, browsing, documents, and everyday work.", specs: ["15-inch class display", "Everyday productivity", "Lower-cost Windows option"], bestFor: ["Students", "Basic work", "Budget replacement"], watchFor: ["Confirm RAM and storage before buying", "Check processor generation"] },
+        { name: "Lenovo IdeaPad Slim 3", store: "Best Buy", target: 450, current: 379, original: 529, image: productImages.laptopB, category: "Budget laptop", description: "A value-focused laptop line often discounted for everyday home and school use.", specs: ["Portable chassis", "Everyday keyboard", "Frequent sale pricing"], bestFor: ["Home office", "School", "Streaming"], watchFor: ["Avoid low-memory configurations", "Check display brightness"] },
+        { name: "ASUS Vivobook 15", store: "Walmart", target: 430, current: 399, original: 549, image: productImages.laptopC, category: "Budget laptop", description: "A common budget-friendly notebook family with a large screen and mainstream specs.", specs: ["15-inch class display", "Windows laptop", "Often available under $450"], bestFor: ["Large-screen browsing", "Documents", "Video calls"], watchFor: ["Compare CPU and RAM between listings"] },
+        { name: "Refurbished MacBook Air M1", store: "eBay", target: 650, current: 579, original: 799, image: productImages.laptopD, category: "Budget Mac option", description: "A lower-cost way to stay in the Mac ecosystem if you are comfortable buying refurbished.", specs: ["Apple silicon", "Lightweight body", "Long battery life"], bestFor: ["Mac users", "Battery life", "Portable work"], watchFor: ["Verify battery health", "Buy from a reputable refurbisher"] }
+      ],
+      default: [
+        { name: "Budget-friendly starter option", store: "Amazon", target: 80, current: 59, original: 99, image: productImages.shoppingBudget, category: "Budget pick", description: "The lowest-cost option Dealwise found for comparison shopping.", specs: ["Low price", "Basic feature set", "Good first comparison"], bestFor: ["Saving money", "Trying the category"], watchFor: ["Verify exact specs and seller"] },
+        { name: "Best value midrange option", store: "Target", target: 120, current: 89, original: 139, image: productImages.shoppingBudget, category: "Value pick", description: "A balanced option with better expected quality than the cheapest listing.", specs: ["Midrange price", "Better feature mix", "Broad availability"], bestFor: ["Most buyers", "Balanced value"], watchFor: ["Compare warranty and returns"] },
+        { name: "Open-box deal option", store: "Best Buy", target: 150, current: 109, original: 179, image: productImages.shoppingBudget, category: "Open-box value", description: "A budget option to consider if open-box condition is acceptable.", specs: ["Discounted condition", "Return-window dependent", "Potential high value"], bestFor: ["Deal hunters", "Flexible buyers"], watchFor: ["Inspect condition and warranty"] },
+        { name: "Refurbished budget option", store: "eBay", target: 140, current: 99, original: 169, image: productImages.shoppingBudget, category: "Refurbished pick", description: "A lower-price option where seller ratings matter more.", specs: ["Refurbished", "Lower price", "Seller-dependent"], bestFor: ["Maximum savings", "Non-urgent purchases"], watchFor: ["Only buy from highly rated sellers"] }
+      ]
+    };
+
+    budgetCatalog.phone = [
+      { name: "Requested phone offer", store: "Amazon", target: 900, current: 829, original: 999, image: productImages.phone, category: "Phone offer", description: "A store offer for the exact phone you searched.", specs: ["Smartphone", "Store offer", "Compare final checkout price"], bestFor: ["Phone deal tracking"], watchFor: ["Confirm storage, carrier lock, condition, and return policy"] }
+    ];
+
+    budgetCatalog.headphones = [
+      { name: "Anker Soundcore Life Q30", store: "Amazon", target: 70, current: 59, original: 89, image: productImages.headphonesBudget, category: "Budget noise-canceling headphones", description: "A popular low-cost ANC headphone option with strong battery life.", specs: ["Active noise cancellation", "Long battery life", "App EQ"], bestFor: ["Commutes", "Budget ANC", "Work calls"], watchFor: ["Build quality is not premium"] },
+      { name: "Sony WH-CH720N", store: "Best Buy", target: 100, current: 88, original: 149, image: productImages.sony, category: "Value noise-canceling headphones", description: "Sony's lighter, lower-cost ANC model below the flagship XM line.", specs: ["Noise canceling", "Lightweight", "Bluetooth"], bestFor: ["Sony sound on a budget", "Travel"], watchFor: ["ANC is weaker than XM models"] },
+      { name: "JBL Tune 760NC", store: "Walmart", target: 85, current: 69, original: 129, image: productImages.headphonesBudget, category: "Budget headphones", description: "An affordable over-ear option often found on sale.", specs: ["Wireless", "Noise canceling", "Foldable"], bestFor: ["Bass-forward sound", "Sale buyers"], watchFor: ["Comfort varies by head size"] },
+      { name: "Skullcandy Hesh ANC", store: "Target", target: 95, current: 79, original: 134, image: productImages.headphonesBudget, category: "Budget ANC headphones", description: "A lower-priced ANC headphone with simple controls and broad retail availability.", specs: ["ANC", "Wireless", "Over-ear design"], bestFor: ["Casual listening", "Gift buying"], watchFor: ["Check return policy for comfort"] }
+    ];
+
+    budgetCatalog.kitchen = [
+      { name: "Instant Pot Duo 6-Quart", store: "Target", target: 70, current: 69, original: 99, image: productImages.instantPot, category: "Budget multi-cooker", description: "The classic pressure cooker size and feature set for most households.", specs: ["6-quart", "Pressure cook", "Slow cook"], bestFor: ["Meal prep", "Rice and beans"], watchFor: ["Confirm exact size"] },
+      { name: "Crock-Pot Express 6-Quart", store: "Walmart", target: 65, current: 59, original: 89, image: productImages.kitchenBudget, category: "Budget pressure cooker", description: "A low-cost multi-cooker alternative for basic pressure cooking.", specs: ["6-quart", "One-pot meals", "Simple controls"], bestFor: ["Budget kitchens", "Batch cooking"], watchFor: ["Accessory ecosystem is smaller"] },
+      { name: "Hamilton Beach Multi-Cooker", store: "Amazon", target: 60, current: 54, original: 79, image: productImages.kitchenBudget, category: "Budget multi-cooker", description: "A value cooker for simple weeknight meals.", specs: ["Multiple presets", "Compact footprint", "Lower price"], bestFor: ["Small kitchens", "Simple meals"], watchFor: ["Fewer premium features"] },
+      { name: "Ninja Foodi PossibleCooker", store: "Best Buy", target: 100, current: 89, original: 129, image: productImages.kitchenBudget, category: "Value cooker", description: "A slightly higher-budget option with flexible cooking modes.", specs: ["Multi-function cooking", "Family-size pot", "Oven-safe pot on some models"], bestFor: ["Family meals", "Flexible cooking"], watchFor: ["Check model-specific features"] }
+    ];
+
+    budgetCatalog.clothing = [
+      { name: "Levi's 505 Regular Jeans", store: "Amazon", target: 45, current: 39, original: 69, image: productImages.levis, category: "Budget denim", description: "A lower-cost Levi's alternative with a regular straight fit.", specs: ["Regular fit", "Straight leg", "Classic denim"], bestFor: ["Everyday denim", "Value Levi's"], watchFor: ["Wash affects sizing"] },
+      { name: "Wrangler Authentics Regular Fit", store: "Walmart", target: 32, current: 26, original: 39, image: productImages.clothingBudget, category: "Budget jeans", description: "A very affordable everyday denim option.", specs: ["Regular fit", "Five-pocket styling", "Workwear value"], bestFor: ["Lowest price", "Casual wear"], watchFor: ["Fabric feel varies"] },
+      { name: "Amazon Essentials Slim-Fit Jeans", store: "Amazon", target: 35, current: 29, original: 42, image: productImages.clothingBudget, category: "Budget jeans", description: "A simple house-brand denim option for basic outfits.", specs: ["Slim fit", "Stretch denim", "Low price"], bestFor: ["Basic wardrobe", "Budget replacement"], watchFor: ["Check reviews for sizing"] },
+      { name: "Target Goodfellow Jeans", store: "Target", target: 36, current: 30, original: 40, image: productImages.clothingBudget, category: "Budget denim", description: "A clean, inexpensive denim option often available in-store.", specs: ["Modern fits", "Accessible pricing", "Easy returns"], bestFor: ["Try-on convenience", "Budget basics"], watchFor: ["Inventory varies by store"] }
+    ];
+
+    const reviewKnowledge = {
+      "sony wh 1000xm5 headphones": {
+        summary: "Review consensus is very strong: reviewers consistently praise noise canceling, sound quality, comfort, and battery life.",
+        ratings: [
+          "Tom's Guide: 4.5/5.",
+          "What Hi-Fi?: 5/5.",
+          "Digital Trends: Editors' Choice.",
+          "RTINGS: detailed lab-tested review with strong commute/travel performance."
+        ],
+        complaints: ["They do not fold.", "No aptX support.", "Some users mention heat or fit over long sessions.", "ANC expectations vary in some user reviews."]
+      }
+    };
+
+    const items = [
+      {
+        id: 1,
+        name: "Sony WH-1000XM5 Headphones",
+        target: 280,
+        current: 279,
+        original: 349,
+        store: "Amazon",
+        trend: "dropping",
+        image: productImages.sony
+      },
+      {
+        id: 2,
+        name: "Instant Pot Duo 7-in-1",
+        target: 70,
+        current: 89,
+        original: 99,
+        store: "Target",
+        trend: "dropping",
+        image: productImages.instantPot
+      },
+      {
+        id: 3,
+        name: "Kindle Paperwhite",
+        target: 100,
+        current: 109,
+        original: 139,
+        store: "Amazon",
+        trend: "stable",
+        image: productImages.kindle
+      },
+      {
+        id: 4,
+        name: "Levi's 501 Jeans",
+        target: 55,
+        current: 48,
+        original: 79,
+        store: "Levi's",
+        trend: "low",
+        image: productImages.levis
+      }
+    ];
+
+    const productDetails = {
+      "Sony WH-1000XM5 Headphones": {
+        category: "Wireless noise-canceling headphones",
+        image: productImages.sony,
+        description: "Premium over-ear Bluetooth headphones with strong active noise cancellation, long battery life, multipoint pairing, and lightweight comfort.",
+        specs: ["Active noise cancellation", "Up to 30 hours battery life", "Bluetooth multipoint", "USB-C quick charge", "Touch controls"],
+        bestFor: ["Travel", "Open offices", "Long listening sessions"],
+        watchFor: ["No folding hinges", "Often discounted during major retail events"],
+        learnedFacts: []
+      },
+      "Instant Pot Duo 7-in-1": {
+        category: "Multi-cooker",
+        image: productImages.instantPot,
+        description: "A versatile electric pressure cooker that also handles slow cooking, rice, steaming, sauteing, yogurt, and warming.",
+        specs: ["7 cooking modes", "Stainless steel inner pot", "Programmable presets", "6-quart size is common"],
+        bestFor: ["Batch cooking", "Rice and beans", "Weeknight meal prep"],
+        watchFor: ["Check capacity before buying", "Duo Plus and Pro models add upgraded controls"],
+        learnedFacts: []
+      },
+      "Kindle Paperwhite": {
+        category: "E-reader",
+        image: productImages.kindle,
+        description: "A waterproof Kindle with a glare-free display, adjustable warm light, and weeks of battery life for reading books and documents.",
+        specs: ["Waterproof design", "Adjustable warm light", "USB-C charging", "High-resolution glare-free display"],
+        bestFor: ["Travel reading", "Night reading", "Library ebooks"],
+        watchFor: ["Ad-supported models cost less", "Storage needs depend on comics and audiobooks"],
+        learnedFacts: []
+      },
+      "Levi's 501 Jeans": {
+        category: "Straight-leg denim",
+        image: productImages.levis,
+        description: "Classic button-fly straight jeans with a regular fit through the thigh and a timeless five-pocket look.",
+        specs: ["Button fly", "Straight leg", "Cotton denim", "Classic five-pocket styling"],
+        bestFor: ["Everyday casual outfits", "Durable basics", "Vintage-inspired denim"],
+        watchFor: ["Wash affects fit and feel", "Check inseam and shrink guidance"],
+        learnedFacts: []
+      }
+    };
+
+    // Coupons are now Groq-generated per tracked item and cached to Supabase.
+    // Each entry: { code, store, desc, expiry, color, itemName, itemId }.
+    let coupons = [];
+    // Track which item ids we've already loaded coupons for so we don't re-query.
+    const couponsLoadedFor = new Set();
+    let couponsTabLoaded = false;
+
+    const alerts = [
+      { title: "Sony WH-1000XM5 dropped to $279", subtitle: "Below your $280 target", time: "2h ago", color: "var(--green)" },
+      { title: "Levi's 501 hit an all-time low $48", subtitle: "Lowest price this year", time: "5h ago", color: "var(--green)" },
+      { title: "New coupon TARGET15 added", subtitle: "15% off home & kitchen", time: "Yesterday", color: "var(--amber)" },
+      { title: "Instant Pot dropped 10%", subtitle: "Still $19 above target", time: "2d ago", color: "var(--blue)" }
+    ];
+
+    const els = {
+      navSavings: document.querySelector("#navSavings"),
+      itemsTracked: document.querySelector("#itemsTracked"),
+      totalSavings: document.querySelector("#totalSavings"),
+      readyCount: document.querySelector("#readyCount"),
+      watchlistItems: document.querySelector("#watchlistItems"),
+      emptyState: document.querySelector("#emptyState"),
+      addForm: document.querySelector("#addForm"),
+      itemNameField: document.querySelector("#itemNameField"),
+      itemNameError: document.querySelector("#itemNameError"),
+      itemName: document.querySelector("#itemName"),
+      filterMinPrice: document.querySelector("#filterMinPrice"),
+      filterMaxPrice: document.querySelector("#filterMaxPrice"),
+      filterAge: document.querySelector("#filterAge"),
+      filterBrands: document.querySelector("#filterBrands"),
+      targetPriceField: document.querySelector("#targetPriceField"),
+      targetPriceError: document.querySelector("#targetPriceError"),
+      targetPrice: document.querySelector("#targetPrice"),
+      prefGroup: document.querySelector(".pref-group"),
+      prefButtons: Array.from(document.querySelectorAll(".pref-btn")),
+      store: document.querySelector("#store"),
+      suggestions: document.querySelector("#suggestions"),
+      suggestionList: document.querySelector("#suggestionList"),
+      couponGrid: document.querySelector("#couponGrid"),
+      alertFeed: document.querySelector("#alertFeed"),
+      detailBackdrop: document.querySelector("#detailBackdrop"),
+      detailMedia: document.querySelector("#detailMedia"),
+      detailTitle: document.querySelector("#detailTitle"),
+      detailMeta: document.querySelector("#detailMeta"),
+      detailBody: document.querySelector("#detailBody"),
+      detailClose: document.querySelector("#detailClose"),
+      dealbot: document.querySelector("#dealbot"),
+      dealbotToggle: document.querySelector("#dealbotToggle"),
+      dealbotClose: document.querySelector("#dealbotClose"),
+      dealbotCredits: document.querySelector("#dealbotCredits"),
+      dealbotLog: document.querySelector("#dealbotLog"),
+      dealbotForm: document.querySelector("#dealbotForm"),
+      dealbotInput: document.querySelector("#dealbotInput"),
+      toast: document.querySelector("#toast"),
+      srLive: document.querySelector("#srLive"),
+      settingsWrap: document.querySelector("#settingsWrap"),
+      settingsBtn: document.querySelector("#settingsBtn"),
+      settingsMenu: document.querySelector("#settingsMenu"),
+      signOutBtn: document.querySelector("#signOutBtn"),
+      userName: document.querySelector("#userName"),
+      userEmail: document.querySelector("#userEmail"),
+      authBackdrop: document.querySelector("#authBackdrop"),
+      authClose: document.querySelector("#authClose"),
+      authForm: document.querySelector("#authForm"),
+      authTitle: document.querySelector("#authTitle"),
+      authSubtitle: document.querySelector("#authSubtitle"),
+      authTabs: Array.from(document.querySelectorAll(".auth-tab")),
+      authName: document.querySelector("#authName"),
+      authNameField: document.querySelector("#authNameField"),
+      authEmail: document.querySelector("#authEmail"),
+      authPassword: document.querySelector("#authPassword"),
+      authError: document.querySelector("#authError"),
+      authSubmit: document.querySelector("#authSubmit"),
+      authGoogle: document.querySelector("#authGoogle")
+    };
+
+    let nextId = 5;
+    let toastTimer;
+    let pendingRemoveId = null;
+    let pendingRemoveTimer;
+    let selectedSuggestion = null;
+    let pricePref = "cheapest";
+    let activeProductName = "";
+    let dealbotCredits = Number(localStorage.getItem("dealbotCredits") || 200);
+    let dealbotTurn = 0;
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0
+      }).format(value);
+    }
+
+    function normalize(value) {
+      return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    }
+
+    function getStoreLabel(store) {
+      return store && store.trim() ? store.trim() : "Any store";
+    }
+
+    const AFFILIATE_TAG = "dealwise-20";
+
+    function buildAffiliateUrl(url) {
+      if (!url) return url;
+      try {
+        const parsed = new URL(url, window.location.href);
+        const host = parsed.hostname.toLowerCase();
+        const isAmazon = host === "amazon.com" || host.endsWith(".amazon.com") ||
+                         host === "amzn.to" || host.endsWith(".amzn.to") ||
+                         host === "amzn.com" || host.endsWith(".amzn.com");
+        if (isAmazon) {
+          parsed.searchParams.set("tag", AFFILIATE_TAG);
+        }
+        return parsed.toString();
+      } catch (_) {
+        return url;
+      }
+    }
+
+    // Map a store name to the URL that lands directly on that retailer's
+    // product search results page (NOT a Google search). Falls back to Google
+    // shopping for unknown stores.
+    function buildStoreProductUrl(item) {
+      // Best case: the LLM provided a direct product detail URL — use it.
+      const direct = String(item?.productUrl || "").trim();
+      if (direct && /^https?:\/\//i.test(direct)) {
+        // Tack on the Amazon affiliate tag if applicable.
+        try { return buildAffiliateUrl(direct); } catch (_) { return direct; }
+      }
+      const name = String(item?.name || "").trim();
+      // Fall back to a retailer's search page if we know the retailer.
+      const source = String(item?.retailer || item?.store || "").trim().toLowerCase();
+      const q = encodeURIComponent(name);
+      switch (source) {
+        case "amazon":
+          return buildAffiliateUrl(`https://www.amazon.com/s?k=${q}`);
+        case "best buy":
+        case "bestbuy":
+          return `https://www.bestbuy.com/site/searchpage.jsp?st=${q}`;
+        case "walmart":
+          return `https://www.walmart.com/search?q=${q}`;
+        case "target":
+          return `https://www.target.com/s?searchTerm=${q}`;
+        case "ebay":
+          return `https://www.ebay.com/sch/i.html?_nkw=${q}`;
+        case "costco":
+          return `https://www.costco.com/CatalogSearch?keyword=${q}`;
+        case "newegg":
+          return `https://www.newegg.com/p/pl?d=${q}`;
+        case "home depot":
+        case "homedepot":
+          return `https://www.homedepot.com/s/${q}`;
+        case "levi's":
+        case "levis":
+          return `https://www.levi.com/US/en_US/search?q=${q}`;
+        default:
+          // No known store -> Google Shopping (still a product listing, not generic web).
+          return `https://www.google.com/search?tbm=shop&q=${q}`;
+      }
+    }
+
+    function getItemDetails(item) {
+      const details = productDetails[item.name] || {};
+      return {
+        category: item.category || details.category || "Tracked product",
+        image: item.image || details.image || "",
+        description: item.description || details.description || "A product saved to your Dealwise watchlist.",
+        specs: item.specs || details.specs || [],
+        bestFor: item.bestFor || details.bestFor || [],
+        watchFor: item.watchFor || details.watchFor || [],
+        learnedFacts: item.learnedFacts || details.learnedFacts || []
+      };
+    }
+
+    function isKnownProduct(name) {
+      const query = normalize(name);
+      return items.some(item => normalize(item.name) === query) ||
+        Object.keys(productDetails).some(productName => normalize(productName) === query);
+    }
+
+    function inferBudgetCategory(query) {
+      const q = normalize(query);
+      if (/\b(macbook|laptop|notebook|computer|chromebook|windows|pc)\b/.test(q)) return "laptop";
+      if (/\b(iphone|phone|smartphone|android|pixel|galaxy|mobile)\b/.test(q)) return "phone";
+      if (/\b(headphone|earbud|speaker|audio|anc|sony|bose|wh|xm)\b/.test(q)) return "headphones";
+      if (/\b(pot|cooker|air fryer|blender|kitchen|pan|instant)\b/.test(q)) return "kitchen";
+      if (/\b(jeans|shirt|shoes|sneaker|jacket|clothing|pants|levi)\b/.test(q)) return "clothing";
+      return "default";
+    }
+
+    const offerStores = ["Amazon", "Best Buy", "Walmart", "eBay"];
+
+    function typedProductOption(query, target = 0, store = "", offerIndex = 0) {
+      const category = inferBudgetCategory(query);
+      const fallback = budgetCatalog[category][0] || budgetCatalog.default[0];
+      const base = Number(target) > 0 ? Number(target) : fallback.current;
+      const multipliers = [0.92, 0.97, 1, 1.08];
+      const price = Math.max(1, Math.round(base * multipliers[offerIndex]));
+      const offerStore = store || offerStores[offerIndex] || "Any store";
+      return {
+        name: query,
+        store: offerStore,
+        target: base,
+        current: price,
+        original: Math.round(price * 1.22),
+        trend: "stable",
+        image: fallback.image,
+        category: `${category === "laptop" ? "Requested laptop" : "Requested product"} offer`,
+        description: `${query} offer from ${offerStore}. Dealwise keeps the product fixed and compares stores by final price.`,
+        specs: [],
+        bestFor: ["Tracking the exact item you requested"],
+        watchFor: ["Confirm the exact model, seller, condition, and return policy before buying"],
+        learnedFacts: []
+      };
+    }
+
+    function storeOffersForQuery(query, target = 0, preferredStore = "") {
+      const stores = preferredStore
+        ? [preferredStore, ...offerStores.filter(store => normalize(store) !== normalize(preferredStore))]
+        : offerStores;
+      return stores.slice(0, 4)
+        .map((store, index) => typedProductOption(query, target, store, index))
+        .sort((a, b) => a.current - b.current);
+    }
+
+    function localSuggestions(query) {
+      return storeOffersForQuery(query, Number(els.targetPrice.value), els.store.value);
+    }
+
+    function getStatus(item) {
+      if (item.current <= item.target) return { label: "Buy now", className: "buy" };
+      if (item.current <= item.target * 1.15) return { label: "Almost there", className: "almost" };
+      return { label: "Watching", className: "watch" };
+    }
+
+    function getTrendLabel(trend) {
+      if (trend === "dropping") return "↓ Dropping";
+      if (trend === "low") return "★ All-time low";
+      return "→ Stable";
+    }
+
+    function getProgress(item) {
+      if (item.current <= item.target) return 100;
+      const range = Math.max(item.original - item.target, 1);
+      const moved = item.original - item.current;
+      return Math.max(0, Math.min(100, Math.round((moved / range) * 100)));
+    }
+
+    function getSavings() {
+      return items.reduce((sum, item) => sum + Math.max(item.original - item.current, 0), 0);
+    }
+
+    function getReadyCount() {
+      return items.filter(item => item.current <= item.target).length;
+    }
+
+    function getInitials(name) {
+      const words = String(name || "Product")
+        .replace(/[^a-zA-Z0-9 ]/g, " ")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+      return (words[0]?.[0] || "P").toUpperCase() + (words[1]?.[0] || "").toUpperCase();
+    }
+
+    function productMediaMarkup(item, className = "product-media") {
+      return `<div class="${className}" aria-hidden="true">${productMediaContent(item)}</div>`;
+    }
+
+    function productMediaContent(item) {
+      const image = item.image || productDetails[item.name]?.image || "";
+      if (image) {
+        return `<img src="${escapeHtml(image)}" alt="" loading="lazy">`;
+      }
+      return `<span class="product-fallback">${escapeHtml(getInitials(item.name))}</span>`;
+    }
+
+    function simulateItem(name, target, store, suggestion = null) {
+      const current = suggestion?.current || Math.round((target || 100) * (1.06 + Math.random() * 0.22));
+      const original = suggestion?.original || Math.round(current * (1.18 + Math.random() * 0.32));
+      const trend = suggestion?.trend || (Math.random() > 0.5 ? "dropping" : "stable");
+      // No target set: aim a little below the current price so progress still reads sensibly.
+      const resolvedTarget = target > 0 ? target : (suggestion?.target || Math.round(current * 0.9));
+      return {
+        id: nextId++,
+        name: suggestion?.name || name,
+        target: resolvedTarget,
+        current,
+        original,
+        // store = the user's fulfillment preference (In-store / Delivery / Pick up).
+        // retailer = the actual retailer (Amazon / Walmart / Target / ...) used to
+        // build the "open product page" deep link.
+        store: getStoreLabel(store),
+        retailer: suggestion?.store || "",
+        productUrl: suggestion?.productUrl || "",
+        trend,
+        image: suggestion?.image || "",
+        category: suggestion?.category,
+        description: suggestion?.description,
+        specs: suggestion?.specs,
+        bestFor: suggestion?.bestFor,
+        watchFor: suggestion?.watchFor,
+        learnedFacts: suggestion?.learnedFacts || []
+      };
+    }
+
+    // Background: hit the server's scraper to get the actual retailer price.
+    // Updates item.livePrice + item.livePriceCheckedAt on success and re-renders.
+    async function refreshLivePrice(item) {
+      if (!item || !item.productUrl) return;
+      try {
+        const response = await fetch("/api/live-price", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ productUrl: item.productUrl })
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (typeof data.price === "number" && data.price > 0) {
+          item.livePrice = data.price;
+          item.livePriceCheckedAt = new Date().toISOString();
+          renderApp();
+          window.dealwiseAuth?.queueItemsSave();
+        }
+      } catch (error) {
+        console.warn("Live price fetch failed for", item.name, error);
+      }
+    }
+
+    function showToast(message) {
+      window.clearTimeout(toastTimer);
+      els.toast.textContent = message;
+      els.srLive.textContent = message;
+      els.toast.classList.add("show");
+      toastTimer = window.setTimeout(() => {
+        els.toast.classList.remove("show");
+      }, 2200);
+    }
+
+    function renderMetrics() {
+      const savings = getSavings();
+      els.itemsTracked.textContent = items.length;
+      els.totalSavings.textContent = formatMoney(savings);
+      els.readyCount.textContent = getReadyCount();
+      els.navSavings.textContent = formatMoney(savings);
+    }
+
+    function renderWatchlist() {
+      els.watchlistItems.innerHTML = "";
+      els.emptyState.style.display = items.length ? "none" : "block";
+
+      items.forEach(item => {
+        const status = getStatus(item);
+        const progress = getProgress(item);
+        const discount = Math.round(((item.original - item.current) / item.original) * 100);
+
+        const article = document.createElement("article");
+        article.className = "item-card";
+        article.tabIndex = 0;
+        article.dataset.detail = item.id;
+        article.setAttribute("aria-label", `Open details for ${item.name}`);
+        article.innerHTML = `
+          ${productMediaMarkup(item)}
+          <div class="item-main">
+            <h2 class="item-title">${escapeHtml(item.name)}</h2>
+            <div class="meta-line">
+              <span>${escapeHtml(getStoreLabel(item.store))}</span>
+              <span>•</span>
+              <span>Target ${formatMoney(item.target)}</span>
+            </div>
+            <div class="badges">
+              <span class="badge ${status.className}">${status.label}</span>
+              <span class="trend-pill">${getTrendLabel(item.trend)}</span>
+            </div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-copy">
+              <span>Target progress</span>
+              <span>${progress}%</span>
+            </div>
+            <div class="progress-track" aria-label="${progress}% toward target price">
+              <div class="progress-fill" style="width: ${progress}%"></div>
+            </div>
+          </div>
+          <div class="price-block">
+            <div class="current-row">
+              <div class="price display-number">${formatMoney(item.livePrice ?? item.current)}</div>
+              <span class="discount">-${discount}%</span>
+            </div>
+            <div class="was-price">${item.livePrice ? `<span class="live-tag" title="Pulled live from ${escapeHtml(item.retailer || "the retailer")}">LIVE</span> ` : ""}was ${formatMoney(item.original)}</div>
+          </div>
+          <div class="actions">
+            <button class="icon-btn refresh" type="button" aria-label="Refresh live price for ${escapeHtml(item.name)}" title="Refresh live price" data-refresh="${item.id}">↻</button>
+            <a class="icon-btn" href="${escapeHtml(buildStoreProductUrl(item))}" rel="noopener noreferrer" aria-label="Open ${escapeHtml(item.retailer || "store")} page for ${escapeHtml(item.name)}" title="Open product page (cmd+click for new tab)" data-open="${item.id}">↗</a>
+            <button class="icon-btn remove${pendingRemoveId === item.id ? " confirming" : ""}" type="button" aria-label="${pendingRemoveId === item.id ? "Confirm remove" : "Remove"} ${escapeHtml(item.name)}" title="${pendingRemoveId === item.id ? "Confirm remove" : "Remove item"}" data-remove="${item.id}">${pendingRemoveId === item.id ? "Sure?" : "×"}</button>
+          </div>
+        `;
+        els.watchlistItems.appendChild(article);
+      });
+    }
+
+    function renderCoupons() {
+      if (couponsTabLoaded && !items.length) {
+        els.couponGrid.innerHTML = `<div class="coupon-empty"><strong>No tracked items yet.</strong><span>Add items to your watchlist and Dealwise will look up coupons for them.</span></div>`;
+        return;
+      }
+      if (couponsTabLoaded && !coupons.length) {
+        els.couponGrid.innerHTML = `<div class="coupon-empty"><strong>No coupons found.</strong><span>We couldn't find any reliable coupon codes for your tracked items right now. Check back later.</span></div>`;
+        return;
+      }
+      if (!couponsTabLoaded && !coupons.length) {
+        els.couponGrid.innerHTML = `<div class="coupon-empty"><strong>Loading coupons…</strong><span>Searching for promo codes that match your tracked items.</span></div>`;
+        return;
+      }
+      els.couponGrid.innerHTML = coupons.map(coupon => `
+        <article class="coupon-card" style="--accent: ${coupon.color};">
+          <p class="coupon-store">${escapeHtml(coupon.store)}</p>
+          <h2 class="coupon-desc">${escapeHtml(coupon.desc)}</h2>
+          <p class="coupon-expiry">${escapeHtml(coupon.expiry)}</p>
+          ${coupon.itemName ? `<p class="coupon-item">For: <strong>${escapeHtml(coupon.itemName)}</strong></p>` : ""}
+          <div class="code-row">
+            <button class="code-box" type="button" data-copy="${escapeHtml(coupon.code)}" aria-label="Copy coupon code ${escapeHtml(coupon.code)}">${escapeHtml(coupon.code)}</button>
+            <button class="copy-btn" type="button" data-copy="${escapeHtml(coupon.code)}" aria-label="Copy ${escapeHtml(coupon.code)} coupon code">Copy</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    // Pick a rotating accent color for visual variety.
+    const COUPON_COLORS = ["var(--green)", "var(--amber)", "var(--blue)"];
+
+    async function loadCouponsForItem(item) {
+      if (couponsLoadedFor.has(String(item.id))) return [];
+      couponsLoadedFor.add(String(item.id));
+      try {
+        const response = await fetch("/api/item-coupons", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name: item.name, retailer: item.retailer || "", category: item.category || "" })
+        });
+        if (!response.ok) return [];
+        const data = await response.json();
+        const out = (data.coupons || []).map((c, i) => ({
+          code: c.code,
+          store: c.store || item.retailer || "Any store",
+          desc: c.description,
+          expiry: c.expires_on && c.expires_on !== "Unknown" ? `Expires ${c.expires_on}` : (c.expires_on || ""),
+          color: COUPON_COLORS[(coupons.length + i) % COUPON_COLORS.length],
+          itemName: item.name,
+          itemId: item.id
+        }));
+        // Persist to Supabase if signed in.
+        if (out.length) window.dealwiseAuth?.saveItemCoupons?.(item.id, data.coupons || []);
+        return out;
+      } catch (error) {
+        console.error("loadCouponsForItem failed:", error);
+        return [];
+      }
+    }
+
+    async function loadAllCoupons() {
+      if (!items.length) {
+        couponsTabLoaded = true;
+        renderCoupons();
+        return;
+      }
+      // Try to load any cached rows from Supabase first.
+      await window.dealwiseAuth?.loadCachedCoupons?.();
+      renderCoupons();
+      // For items without cached coupons, ask Groq.
+      const needLookup = items.filter(it => !couponsLoadedFor.has(String(it.id)));
+      for (const item of needLookup) {
+        const fresh = await loadCouponsForItem(item);
+        if (fresh.length) {
+          coupons.push(...fresh);
+          renderCoupons();
+        }
+      }
+      couponsTabLoaded = true;
+      renderCoupons();
+    }
+
+    function resetCouponsCache() {
+      // Called when the watchlist changes so the tab will re-query next time.
+      coupons = [];
+      couponsLoadedFor.clear();
+      couponsTabLoaded = false;
+    }
+
+    function renderAlerts() {
+      els.alertFeed.innerHTML = alerts.map(alert => `
+        <article class="alert-card" style="--accent: ${alert.color};">
+          <span class="dot" aria-hidden="true"></span>
+          <div>
+            <h2 class="alert-title">${escapeHtml(alert.title)}</h2>
+            <p class="alert-subtitle">${escapeHtml(alert.subtitle)}</p>
+          </div>
+          <p class="alert-time">${escapeHtml(alert.time)}</p>
+        </article>
+      `).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function setFieldError(field, input, error, message) {
+      field.classList.toggle("invalid", Boolean(message));
+      input.setAttribute("aria-invalid", String(Boolean(message)));
+      error.textContent = message;
+    }
+
+    function clearFormErrors() {
+      setFieldError(els.itemNameField, els.itemName, els.itemNameError, "");
+      setFieldError(els.targetPriceField, els.targetPrice, els.targetPriceError, "");
+    }
+
+    function validateForm() {
+      const name = els.itemName.value.trim();
+      const isCustom = pricePref === "custom";
+      const rawTarget = isCustom ? els.targetPrice.value.trim() : "";
+      const target = Number(rawTarget);
+      const nameMessage = name ? "" : "Enter an item name.";
+      // Custom price is optional, but if typed it must be a positive number.
+      const targetMessage = isCustom && rawTarget && !(Number.isFinite(target) && target > 0)
+        ? "Enter a price above $0, or leave it blank."
+        : "";
+
+      setFieldError(els.itemNameField, els.itemName, els.itemNameError, nameMessage);
+      setFieldError(els.targetPriceField, els.targetPrice, els.targetPriceError, targetMessage);
+
+      if (nameMessage) {
+        els.itemName.focus();
+        return null;
+      }
+
+      if (targetMessage) {
+        els.targetPrice.focus();
+        return null;
+      }
+
+      return { name, target: rawTarget ? Math.round(target) : 0, pref: pricePref };
+    }
+
+    async function fetchSuggestions(query) {
+      try {
+        const params = new URLSearchParams({
+          q: query,
+          target: pricePref === "custom" ? els.targetPrice.value : "",
+          store: els.store.value,
+          pref: pricePref
+        });
+        // Optional filters from the "More filters" panel — only sent when set.
+        if (els.filterMinPrice?.value) params.set("min_price", els.filterMinPrice.value);
+        if (els.filterMaxPrice?.value) params.set("max_price", els.filterMaxPrice.value);
+        if (els.filterAge?.value) params.set("age", els.filterAge.value);
+        if (els.filterBrands?.value.trim()) params.set("brands", els.filterBrands.value.trim());
+        const response = await fetch(`/api/suggest?${params.toString()}`);
+        if (!response.ok) throw new Error("Suggestion lookup failed");
+        const data = await response.json();
+        return data.suggestions || [];
+      } catch {
+        return localSuggestions(query);
+      }
+    }
+
+    function renderSuggestions(suggestions) {
+      if (!suggestions.length) {
+        els.suggestions.classList.remove("show");
+        els.suggestionList.innerHTML = "";
+        return;
+      }
+
+      els.suggestionList.innerHTML = suggestions.map((suggestion, index) => `
+        <button class="suggestion-btn" type="button" data-suggestion="${index}">
+          ${productMediaMarkup(suggestion, "suggestion-thumb")}
+          <span>
+            <strong>${escapeHtml(suggestion.name)}</strong>
+            <span>${escapeHtml(suggestion.category || "Suggested product")} · ${escapeHtml(getStoreLabel(suggestion.store))}</span>
+          </span>
+        </button>
+      `).join("");
+      els.suggestions.classList.add("show");
+      els.suggestionList._suggestions = suggestions;
+    }
+
+    function hideSuggestions() {
+      selectedSuggestion = null;
+      els.suggestions.classList.remove("show");
+      els.suggestionList.innerHTML = "";
+      els.suggestionList._suggestions = [];
+    }
+
+    function renderList(values) {
+      if (!values || !values.length) return "<p>No extra details saved yet.</p>";
+      return `<ul>${values.map(value => `<li>${escapeHtml(value.text || value)}</li>`).join("")}</ul>`;
+    }
+
+    function renderDetailBody(item, details, options = {}) {
+      const status = getStatus(item);
+      const isLoading = options.loading;
+      const reviewSection = isLoading
+        ? `<p class="detail-loading">Generating live details and review summary…</p>`
+        : `
+          ${details.rating_estimate ? `<p class="detail-rating"><strong>Rating:</strong> ${escapeHtml(details.rating_estimate)}</p>` : ""}
+          <section class="detail-section">
+            <h3>Description</h3>
+            <p>${escapeHtml(details.description || "No description available.")}</p>
+          </section>
+          <section class="detail-section">
+            <h3>Specs and features</h3>
+            ${renderList(details.specs)}
+          </section>
+          <section class="detail-section">
+            <h3>Pros</h3>
+            ${renderList(details.pros)}
+          </section>
+          <section class="detail-section">
+            <h3>Cons</h3>
+            ${renderList(details.cons)}
+          </section>
+          <section class="detail-section">
+            <h3>What reviewers say</h3>
+            <p>${escapeHtml(details.review_summary || "No review summary available.")}</p>
+          </section>
+          <section class="detail-section">
+            <h3>Dealbot knowledge</h3>
+            ${renderList(item.learnedFacts || [])}
+          </section>
+          <p class="detail-disclaimer">Details and reviews are AI-generated. Verify before buying.</p>
+          <button class="auth-btn-secondary detail-refresh" type="button" id="detailRefreshBtn">Refresh details</button>
+        `;
+      els.detailBody.innerHTML = `
+        <div class="detail-grid">
+          <div class="detail-stat"><span>Current</span><strong>${formatMoney(item.current)}</strong></div>
+          <div class="detail-stat"><span>Target</span><strong>${formatMoney(item.target)}</strong></div>
+          <div class="detail-stat"><span>Original</span><strong>${formatMoney(item.original)}</strong></div>
+        </div>
+        ${reviewSection}
+      `;
+      const refreshBtn = document.querySelector("#detailRefreshBtn");
+      if (refreshBtn) refreshBtn.addEventListener("click", () => loadProductDetails(item, { force: true }));
+    }
+
+    async function loadProductDetails(item, { force = false } = {}) {
+      if (item.details && !force) {
+        renderDetailBody(item, item.details);
+        return;
+      }
+      renderDetailBody(item, {}, { loading: true });
+      try {
+        const response = await fetch("/api/product-details", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name: item.name, retailer: item.retailer || "" })
+        });
+        if (!response.ok) throw new Error("details lookup failed");
+        const data = await response.json();
+        item.details = data.details || {};
+        renderDetailBody(item, item.details);
+        // Persist so Dealbot has it as context and we don't re-fetch on next open.
+        window.dealwiseAuth?.queueItemsSave();
+      } catch (error) {
+        console.error("Product details fetch failed:", error);
+        renderDetailBody(item, {
+          description: "Could not load AI-generated details right now.",
+          specs: [], pros: [], cons: [], review_summary: "", rating_estimate: ""
+        });
+      }
+    }
+
+    function openDetails(item) {
+      activeProductName = item.name;
+      els.dealbotCredits.textContent = `${dealbotCredits} credits · ${item.name}`;
+      const fallback = getItemDetails(item);
+      els.detailMedia.innerHTML = productMediaContent({ ...item, image: item.image || fallback.image });
+      els.detailTitle.textContent = item.name;
+      els.detailMeta.textContent = `${item.retailer || fallback.category || "Tracked product"} · ${getStoreLabel(item.store)} · ${getStatus(item).label}`;
+      els.detailBackdrop.classList.add("show");
+      els.detailBackdrop.setAttribute("aria-hidden", "false");
+      loadProductDetails(item);
+      els.detailClose.focus();
+    }
+
+    function closeDetails() {
+      els.detailBackdrop.classList.remove("show");
+      els.detailBackdrop.setAttribute("aria-hidden", "true");
+      activeProductName = "";
+    }
+
+    function updateCredits() {
+      localStorage.setItem("dealbotCredits", String(dealbotCredits));
+      window.dealwiseAuth?.queueCreditsSave();
+      const productSuffix = activeProductName ? ` · ${activeProductName}` : " left";
+      els.dealbotCredits.textContent = `${dealbotCredits} credits${productSuffix}`;
+    }
+
+    function appendChat(message, sender = "bot") {
+      const bubble = document.createElement("div");
+      bubble.className = `chat-msg ${sender === "user" ? "user" : ""}`;
+      bubble.textContent = message;
+      els.dealbotLog.appendChild(bubble);
+      els.dealbotLog.scrollTop = els.dealbotLog.scrollHeight;
+    }
+
+    // Render a Dealbot-built setup as a confirmable card with per-item and
+    // "Add all" buttons. Nothing is tracked until the user clicks.
+    function renderSetupProposal(setup) {
+      const total = setup.reduce((sum, s) => sum + (Number(s.current) || 0), 0);
+      const card = document.createElement("div");
+      card.className = "setup-proposal";
+      card.innerHTML = `
+        <div class="setup-head">
+          <strong>Suggested setup</strong>
+          <span>${setup.length} items · ${formatMoney(total)}</span>
+        </div>
+        <div class="setup-items">
+          ${setup.map((s, i) => `
+            <div class="setup-item" data-setup-index="${i}">
+              <div class="setup-item-info">
+                <strong>${escapeHtml(s.name)}</strong>
+                <span>${escapeHtml(s.category || "Item")} · ${escapeHtml(getStoreLabel(s.store))} · ${formatMoney(s.current)}</span>
+              </div>
+              <button class="setup-add" type="button" data-setup-add="${i}">Add</button>
+            </div>
+          `).join("")}
+        </div>
+        <button class="setup-add-all primary-btn" type="button" data-setup-add-all>Add all to watchlist</button>
+      `;
+      card._setup = setup;
+      els.dealbotLog.appendChild(card);
+      els.dealbotLog.scrollTop = els.dealbotLog.scrollHeight;
+    }
+
+    function addSetupItemToWatchlist(s) {
+      const item = simulateItem(s.name, Number(s.current) || 0, s.store || "", {
+        name: s.name,
+        store: s.store || "",
+        current: s.current,
+        original: s.original,
+        target: s.current,
+        category: s.category,
+        description: s.description,
+        image: s.image,
+        productUrl: s.productUrl
+      });
+      // simulateItem maps suggestion.store -> retailer; keep store as retailer here too.
+      item.retailer = s.retailer || s.store || item.retailer;
+      items.unshift(item);
+      return item;
+    }
+
+    // Delegate clicks inside the chat log for setup add buttons.
+    els.dealbotLog.addEventListener("click", event => {
+      const card = event.target.closest(".setup-proposal");
+      if (!card || !card._setup) return;
+      const addOne = event.target.closest("[data-setup-add]");
+      const addAll = event.target.closest("[data-setup-add-all]");
+
+      if (addOne) {
+        const idx = Number(addOne.dataset.setupAdd);
+        const s = card._setup[idx];
+        if (s) {
+          addSetupItemToWatchlist(s);
+          addOne.textContent = "Added ✓";
+          addOne.disabled = true;
+          renderApp();
+          window.dealwiseAuth?.queueItemsSave();
+          resetCouponsCache();
+          showToast(`Tracking ${s.name}`);
+        }
+        return;
+      }
+
+      if (addAll) {
+        let added = 0;
+        card._setup.forEach(s => { addSetupItemToWatchlist(s); added++; });
+        card.querySelectorAll("[data-setup-add]").forEach(b => { b.textContent = "Added ✓"; b.disabled = true; });
+        addAll.textContent = `Added ${added} items ✓`;
+        addAll.disabled = true;
+        renderApp();
+        window.dealwiseAuth?.queueItemsSave();
+        resetCouponsCache();
+        showToast(`Added ${added} items to your watchlist`);
+      }
+    });
+
+    function classifyQuestion(question) {
+      const q = normalize(question);
+      if (/\b(specs?|features?|battery|size|dimensions?|waterproof|noise|material|fit)\b/.test(q)) return "specs";
+      if (/\b(buy|worth|deal|good price|pull trigger|purchase)\b/.test(q)) return "buy";
+      if (/\b(wait|when|time|timing|sale|black friday|prime day|drop)\b/.test(q)) return "timing";
+      if (/\b(coupon|code|promo|discount)\b/.test(q)) return "coupon";
+      if (/\b(reviews?|ratings?|complaints?|people say|users say)\b/.test(q)) return "review";
+      if (/\b(compare|versus| vs |alternative|instead|better)\b/.test(` ${q} `)) return "compare";
+      if (/\b(store|where|seller|amazon|target|best buy|walmart|ebay)\b/.test(q)) return "store";
+      if (/\b(risks?|problems?|issues?|watch|fake|return)\b/.test(q)) return "risk";
+      return "general";
+    }
+
+    function compactList(values, fallback) {
+      return Array.isArray(values) && values.length ? values.slice(0, 3).join(", ") : fallback;
+    }
+
+    function reviewAnswer(product, lead) {
+      const known = reviewKnowledge[normalize(product.name)];
+      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(`${product.name} reviews rating`)}`;
+      if (known) {
+        return `${lead} ${known.summary} Ratings saved for this product: ${known.ratings.join(" ")} Common complaints: ${known.complaints.join(" ")} Google review search: ${googleUrl}`;
+      }
+      return `${lead} I can research reviews for ${product.name}, but I do not have a verified rating saved yet. Google review search for this exact item: ${googleUrl}. Look for repeated complaints, star ratings from known review sites, and whether reviewers are discussing the same model/store condition.`;
+    }
+
+    function fallbackDealbot(question) {
+      const product = items.find(item => item.name === activeProductName);
+      if (!product) return "Open a tracked item first, then I will answer only about that product.";
+      const details = getItemDetails(product);
+      const intent = classifyQuestion(question);
+      const leads = ["Here is the practical read:", "Short version:", "My take:", "For this item:"];
+      const lead = leads[dealbotTurn % leads.length];
+      const savings = Math.max(product.original - product.current, 0);
+      const aboveTarget = Math.max(product.current - product.target, 0);
+
+      if (intent === "specs") {
+        return `${lead} ${product.name} is a ${details.category}. Key details: ${compactList(details.specs, details.description)}. Best for: ${compactList(details.bestFor, "general comparison shopping")}.`;
+      }
+      if (intent === "buy") {
+        return product.current <= product.target
+          ? `${lead} I would treat ${product.name} as buy-ready at ${formatMoney(product.current)}. It is within your ${formatMoney(product.target)} target and saves ${formatMoney(savings)} versus the original price.`
+          : `${lead} I would wait on ${product.name}. It is ${formatMoney(aboveTarget)} above target, so a coupon or another drop would matter.`;
+      }
+      if (intent === "timing") {
+        return `${lead} The trend is ${getTrendLabel(product.trend).replace(/[↓→★]/g, "").trim().toLowerCase()}. Current price is ${formatMoney(product.current)} against your ${formatMoney(product.target)} target, so ${product.current <= product.target ? "this is already a good window" : "keep the alert on and wait for the next drop"}.`;
+      }
+      if (intent === "coupon") {
+        return `${lead} Use coupons only against the checkout total. If a code brings ${product.name} to ${formatMoney(product.target)} or less, mark it buy-ready.`;
+      }
+      if (intent === "review") {
+        return reviewAnswer(product, lead);
+      }
+      if (intent === "compare") {
+        return `${lead} Compare alternatives against these must-haves: ${compactList(details.specs, "price, model, warranty")}. Anything weaker should be meaningfully cheaper than ${formatMoney(product.target)}.`;
+      }
+      if (intent === "store") {
+        return `${lead} It is tracked at ${getStoreLabel(product.store)}. I would still search at least two other sellers and confirm the exact model before checkout.`;
+      }
+      if (intent === "risk") {
+        return `${lead} Watch for: ${compactList(details.watchFor, "seller reputation, exact model number, and return window")}. Very low prices deserve a fake/condition check.`;
+      }
+      return `${lead} ${product.name} is ${formatMoney(product.current)} with a ${formatMoney(product.target)} target. ${details.description} The next useful check is exact model plus seller return policy.`;
+    }
+
+    function saveLearnedFact(productName, fact) {
+      const item = items.find(entry => entry.name === productName);
+      if (!item || !fact) return;
+      item.learnedFacts = [...(item.learnedFacts || []), fact].slice(-8);
+      if (productDetails[productName]) {
+        productDetails[productName].learnedFacts = item.learnedFacts;
+      }
+      showToast(`Dealbot saved a fact for ${item.name}`);
+    }
+
+    async function copyCode(code, trigger) {
+      try {
+        await navigator.clipboard.writeText(code);
+      } catch (error) {
+        const temp = document.createElement("textarea");
+        temp.value = code;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        temp.remove();
+      }
+      if (trigger) {
+        const previousLabel = trigger.getAttribute("aria-label") || `Copy coupon code ${code}`;
+        trigger.setAttribute("aria-label", `Copied! ${code}`);
+        window.setTimeout(() => trigger.setAttribute("aria-label", previousLabel), 1800);
+      }
+      showToast(`Copied coupon code ${code}`);
+    }
+
+    document.querySelectorAll(".tab-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.tab;
+        document.querySelectorAll(".tab-btn").forEach(tab => {
+          const isActive = tab === button;
+          tab.classList.toggle("active", isActive);
+          tab.setAttribute("aria-selected", String(isActive));
+        });
+        document.querySelectorAll(".panel").forEach(panel => {
+          panel.classList.toggle("active", panel.id === target);
+        });
+        if (target === "coupons" && !couponsTabLoaded) {
+          loadAllCoupons();
+        }
+      });
+    });
+
+    els.addForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const valid = validateForm();
+
+      if (!valid) {
+        return;
+      }
+
+      if (!selectedSuggestion && !isKnownProduct(valid.name)) {
+        const submitBtn = els.addForm.querySelector("button[type=submit]");
+        const originalLabel = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Finding matches…";
+        let suggestions = [];
+        try {
+          suggestions = await fetchSuggestions(valid.name);
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalLabel;
+        }
+        renderSuggestions(suggestions);
+        showToast("Pick a matching product or press Track it again to keep your typed item");
+        selectedSuggestion = { allowManual: true };
+        return;
+      }
+
+      const suggestion = selectedSuggestion?.allowManual ? null : selectedSuggestion;
+      const item = simulateItem(valid.name, valid.target, els.store.value, suggestion);
+      items.unshift(item);
+      els.addForm.reset();
+      setPricePref("cheapest");
+      clearFormErrors();
+      hideSuggestions();
+      renderApp();
+      showToast(`Tracking ${item.name}`);
+      els.itemName.focus();
+      window.dealwiseAuth?.queueItemsSave();
+      resetCouponsCache();
+      // Kick off a live-price fetch in the background.
+      refreshLivePrice(item);
+    });
+
+    els.itemName.addEventListener("input", () => {
+      // Matches are only fetched when the user clicks "Track it", so editing the
+      // item name clears any previously selected/shown matches.
+      selectedSuggestion = null;
+      if (els.itemNameField.classList.contains("invalid")) validateForm();
+      hideSuggestions();
+    });
+
+    els.targetPrice.addEventListener("input", () => {
+      // Editing the price re-runs the lookup on the next Track it click.
+      selectedSuggestion = null;
+      hideSuggestions();
+      if (els.targetPriceField.classList.contains("invalid")) validateForm();
+    });
+
+    function setPricePref(pref) {
+      pricePref = pref;
+      els.prefButtons.forEach(btn => {
+        const active = btn.dataset.pref === pref;
+        btn.classList.toggle("is-active", active);
+        btn.setAttribute("aria-checked", String(active));
+      });
+      const isCustom = pref === "custom";
+      els.targetPrice.hidden = !isCustom;
+      if (!isCustom) {
+        setFieldError(els.targetPriceField, els.targetPrice, els.targetPriceError, "");
+      } else {
+        els.targetPrice.focus();
+      }
+      // Changing the preference invalidates any shown matches.
+      selectedSuggestion = null;
+      hideSuggestions();
+    }
+
+    els.prefButtons.forEach(btn => {
+      btn.addEventListener("click", () => setPricePref(btn.dataset.pref));
+    });
+
+    els.suggestionList.addEventListener("click", event => {
+      const button = event.target.closest("[data-suggestion]");
+      if (!button) return;
+      const suggestion = els.suggestionList._suggestions[Number(button.dataset.suggestion)];
+      if (!suggestion) return;
+      selectedSuggestion = suggestion;
+      els.itemName.value = suggestion.name;
+      if (!els.targetPrice.value && suggestion.target) els.targetPrice.value = suggestion.target;
+      if (suggestion.store) els.store.value = suggestion.store;
+      showToast(`${suggestion.name} selected`);
+    });
+
+    // Items now use Supabase UUIDs (strings) instead of session-local numbers,
+    // so compare as strings everywhere.
+    function findItemById(rawId) {
+      const id = String(rawId);
+      return items.find(entry => String(entry.id) === id);
+    }
+
+    els.watchlistItems.addEventListener("click", event => {
+      const openButton = event.target.closest("[data-open]");
+      const removeButton = event.target.closest("[data-remove]");
+      const refreshButton = event.target.closest("[data-refresh]");
+      const detailCard = event.target.closest("[data-detail]");
+
+      if (refreshButton) {
+        event.stopPropagation();
+        const item = findItemById(refreshButton.dataset.refresh);
+        if (item) {
+          showToast(`Refreshing price for ${item.name}…`);
+          refreshLivePrice(item);
+        }
+        return;
+      }
+
+      if (openButton) {
+        // Stop the click from bubbling to the card's open-details handler.
+        event.stopPropagation();
+        const item = findItemById(openButton.dataset.open);
+        const href = openButton.getAttribute && openButton.getAttribute("href");
+        console.log("[arrow] click", { tag: openButton.tagName, id: openButton.dataset.open, href, item: item ? { name: item.name, retailer: item.retailer, productUrl: item.productUrl } : null });
+        if (!item) return;
+        const retailerLabel = item.retailer || "product page";
+        showToast(`Opening ${retailerLabel} for ${item.name}`);
+        // If the rendered <a> doesn't carry an href (stale render, etc.), the
+        // browser won't navigate on its own — do it programmatically.
+        if (!href || href === "#") {
+          event.preventDefault();
+          const fallback = buildStoreProductUrl(item);
+          console.log("[arrow] no href, programmatic open:", fallback);
+          if (fallback) window.open(fallback, "_blank", "noopener,noreferrer");
+        }
+        return;
+      }
+
+      if (removeButton) {
+        event.stopPropagation();
+        const itemId = String(removeButton.dataset.remove);
+        const index = items.findIndex(item => String(item.id) === itemId);
+        if (index > -1) {
+          if (String(pendingRemoveId) !== itemId) {
+            pendingRemoveId = itemId;
+            window.clearTimeout(pendingRemoveTimer);
+            renderWatchlist();
+            pendingRemoveTimer = window.setTimeout(() => {
+              pendingRemoveId = null;
+              renderWatchlist();
+            }, 2000);
+            return;
+          }
+
+          window.clearTimeout(pendingRemoveTimer);
+          pendingRemoveId = null;
+          const [removed] = items.splice(index, 1);
+          if (activeProductName === removed.name) {
+            activeProductName = "";
+            els.dealbotCredits.textContent = `${dealbotCredits} credits left`;
+          }
+          renderApp();
+          window.dealwiseAuth?.queueItemsSave();
+          resetCouponsCache();
+          showToast(`Removed ${removed.name}`);
+        }
+        return;
+      }
+
+      if (detailCard) {
+        const item = findItemById(detailCard.dataset.detail);
+        if (item) openDetails(item);
+      }
+    });
+
+    els.watchlistItems.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const detailCard = event.target.closest("[data-detail]");
+      if (!detailCard) return;
+      event.preventDefault();
+      const item = findItemById(detailCard.dataset.detail);
+      if (item) openDetails(item);
+    });
+
+    els.couponGrid.addEventListener("click", event => {
+      const copyTarget = event.target.closest("[data-copy]");
+      if (copyTarget) {
+        copyCode(copyTarget.dataset.copy, copyTarget);
+      }
+    });
+
+    els.detailClose.addEventListener("click", closeDetails);
+
+    els.detailBackdrop.addEventListener("click", event => {
+      if (event.target === els.detailBackdrop) closeDetails();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeDetails();
+    });
+
+    els.dealbotToggle.addEventListener("click", () => {
+      els.dealbot.classList.add("open");
+      els.dealbotInput.focus();
+    });
+
+    els.dealbotClose.addEventListener("click", () => {
+      els.dealbot.classList.remove("open");
+    });
+
+    els.dealbotForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const question = els.dealbotInput.value.trim();
+      if (!question) return;
+      if (dealbotCredits <= 0) {
+        appendChat("You have used your 200 Dealbot demo credits.", "bot");
+        return;
+      }
+
+      dealbotCredits -= 1;
+      dealbotTurn += 1;
+      updateCredits();
+      els.dealbotInput.value = "";
+      appendChat(question, "user");
+      appendChat("Thinking…", "bot");
+
+      try {
+        // Send the FULL watchlist (with cached details) so Dealbot can answer
+        // about any tracked item, not just the currently-open one.
+        const watchlist = items.map(item => ({
+          id: item.id,
+          name: item.name,
+          retailer: item.retailer || "",
+          store: item.store || "",
+          current: item.current,
+          target: item.target,
+          original: item.original,
+          trend: item.trend,
+          details: item.details || null
+        }));
+
+        const response = await fetch("/api/dealbot", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ question, watchlist, activeProductName })
+        });
+        if (!response.ok) throw new Error("Dealbot API error " + response.status);
+        const data = await response.json();
+        const answer = (data.answer || "").trim() || "Dealbot didn't return an answer.";
+        els.dealbotLog.lastElementChild.textContent = answer;
+
+        // If Dealbot built a setup/shopping list, render it with an Add-all action.
+        if (Array.isArray(data.setup) && data.setup.length) {
+          renderSetupProposal(data.setup);
+        }
+
+        // If Dealbot identified a tracked item, save the answer as a learned fact on it.
+        const matched = items.find(it => String(it.id) === String(data.matchedItemId));
+        if (matched) {
+          saveLearnedFact(matched.name, { text: answer, source: "Dealbot AI", savedAt: new Date().toISOString() });
+        }
+      } catch (error) {
+        console.error("Dealbot request failed:", error);
+        els.dealbotLog.lastElementChild.textContent = "Dealbot is unavailable right now. Try again in a moment.";
+      }
+    });
+
+    function renderApp() {
+      renderMetrics();
+      renderWatchlist();
+    }
+
+    updateCredits();
+    renderApp();
+    renderCoupons();
+    renderAlerts();
+
+    // ============================================================
+    //  Auth + per-user sync (Supabase)
+    // ============================================================
+    const auth = {
+      client: null,
+      user: null,
+      profile: null,
+      mode: "signin",   // "signin" | "signup"
+      locked: true,     // true while the login wall is up
+      saveTimer: null
+    };
+
+    async function bootAuth() {
+      try {
+        const cfgRes = await fetch("/api/config");
+        const cfg = await cfgRes.json();
+        if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) {
+          console.warn("Supabase config missing; auth disabled.");
+          document.body.classList.remove("auth-required");
+          return;
+        }
+        // Wait for the ES-module SDK shim if it hasn't loaded yet.
+        if (typeof window.supabaseCreateClient !== "function") {
+          await new Promise(resolve => window.addEventListener("supabase-sdk-ready", resolve, { once: true }));
+        }
+        auth.client = window.supabaseCreateClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+          auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+        });
+
+        auth.client.auth.onAuthStateChange((event, session) => {
+          handleAuthChange(session?.user || null);
+        });
+
+        const { data } = await auth.client.auth.getSession();
+        await handleAuthChange(data.session?.user || null);
+      } catch (error) {
+        console.error("Auth boot failed:", error);
+        // Drop the wall on boot failure so the app remains usable in degraded mode.
+        document.body.classList.remove("auth-required");
+      }
+    }
+
+    async function handleAuthChange(user) {
+      const wasSignedIn = !!auth.user;
+      auth.user = user;
+
+      if (user) {
+        // Load profile + items from Supabase, replace local state.
+        const [{ data: profile }, { data: rows }] = await Promise.all([
+          auth.client.from("profiles").select("*").eq("id", user.id).single(),
+          auth.client.from("tracked_items").select("*").eq("user_id", user.id).order("created_at", { ascending: false })
+        ]);
+        auth.profile = profile || null;
+        if (profile) {
+          dealbotCredits = Number(profile.dealbot_credits || 0);
+          localStorage.setItem("dealbotCredits", String(dealbotCredits));
+        }
+        items.length = 0;
+        for (const row of rows || []) items.push(rowToItem(row));
+        nextId = items.reduce((max, it) => Math.max(max, Number(it.id) || 0), 0) + 1;
+        resetCouponsCache();
+        updateUserChip();
+        updateCredits();
+        renderApp();
+        renderCoupons();
+        if (!wasSignedIn) {
+          showToast(`Welcome back, ${displayName()}`);
+        }
+        // Drop the login wall and close the modal.
+        document.body.classList.remove("auth-required");
+        closeAuthModalForced();
+      } else {
+        // No user: clear any local items and put the login wall up.
+        auth.profile = null;
+        items.length = 0;
+        nextId = 1;
+        resetCouponsCache();
+        updateUserChip();
+        renderApp();
+        renderCoupons();
+        document.body.classList.add("auth-required");
+        openAuthModalLocked();
+        if (wasSignedIn) showToast("Signed out");
+      }
+    }
+
+    function displayName() {
+      return (auth.profile?.display_name)
+        || (auth.user?.user_metadata?.display_name)
+        || (auth.user?.user_metadata?.full_name)
+        || (auth.user?.email?.split("@")[0])
+        || "Account";
+    }
+
+    function updateUserChip() {
+      if (auth.user) {
+        els.userName.textContent = displayName();
+        els.userEmail.textContent = auth.user.email || "";
+        els.settingsWrap.hidden = false;
+      } else {
+        els.settingsWrap.hidden = true;
+        closeSettingsMenu();
+      }
+    }
+
+    function openSettingsMenu() {
+      els.settingsMenu.hidden = false;
+      els.settingsBtn.setAttribute("aria-expanded", "true");
+    }
+
+    function closeSettingsMenu() {
+      els.settingsMenu.hidden = true;
+      els.settingsBtn.setAttribute("aria-expanded", "false");
+    }
+
+    function rowToItem(row) {
+      return {
+        id: row.id,
+        name: row.name,
+        store: row.store || "",
+        retailer: row.retailer || "",
+        productUrl: row.product_url || "",
+        livePrice: row.live_price != null ? Number(row.live_price) : null,
+        livePriceCheckedAt: row.live_price_checked_at || null,
+        category: row.category || "",
+        description: row.description || "",
+        image: row.image || "",
+        target: Number(row.target) || 0,
+        current: Number(row.current) || 0,
+        original: Number(row.original) || 0,
+        trend: row.trend || "stable",
+        specs: row.specs || [],
+        bestFor: row.best_for || [],
+        watchFor: row.watch_for || [],
+        learnedFacts: row.learned_facts || [],
+        details: row.details || null
+      };
+    }
+
+    function itemToRow(item) {
+      return {
+        id: typeof item.id === "string" ? item.id : undefined, // let DB generate uuid
+        user_id: auth.user.id,
+        name: item.name,
+        store: item.store || null,
+        retailer: item.retailer || null,
+        product_url: item.productUrl || null,
+        live_price: item.livePrice != null ? Math.round(item.livePrice) : null,
+        live_price_checked_at: item.livePriceCheckedAt || null,
+        category: item.category || null,
+        description: item.description || null,
+        image: item.image || null,
+        target: item.target,
+        current: item.current,
+        original: item.original,
+        trend: item.trend || "stable",
+        specs: item.specs || [],
+        best_for: item.bestFor || [],
+        watch_for: item.watchFor || [],
+        learned_facts: item.learnedFacts || [],
+        details: item.details || null
+      };
+    }
+
+    // Persist the entire local items list to Supabase by replacing the user's
+    // rows. Debounced so rapid changes coalesce into one round-trip.
+    function queueItemsSave() {
+      if (!auth.user || !auth.client) return;
+      clearTimeout(auth.saveTimer);
+      auth.saveTimer = setTimeout(async () => {
+        try {
+          await auth.client.from("tracked_items").delete().eq("user_id", auth.user.id);
+          if (items.length) {
+            const rows = items.map(itemToRow).map(({ id: _drop, ...rest }) => rest);
+            const { data, error } = await auth.client.from("tracked_items").insert(rows).select();
+            if (error) throw error;
+            // Replace local ids with the DB-generated uuids so subsequent saves match.
+            for (let i = 0; i < data.length && i < items.length; i++) items[i].id = data[i].id;
+          }
+        } catch (error) {
+          console.error("Items save failed:", error);
+        }
+      }, 600);
+    }
+
+    function queueCreditsSave() {
+      if (!auth.user || !auth.client) return;
+      clearTimeout(auth.saveTimer);
+      auth.saveTimer = setTimeout(async () => {
+        try {
+          await auth.client.from("profiles").update({ dealbot_credits: dealbotCredits, updated_at: new Date().toISOString() }).eq("id", auth.user.id);
+        } catch (error) {
+          console.error("Credits save failed:", error);
+        }
+      }, 600);
+    }
+
+    // Persist coupons for a tracked item to Supabase. Replaces any existing
+    // rows for that item so the cache stays in sync with the latest LLM call.
+    async function saveItemCoupons(itemId, couponList) {
+      if (!auth.user || !auth.client || !itemId) return;
+      try {
+        await auth.client.from("item_coupons")
+          .delete()
+          .eq("user_id", auth.user.id)
+          .eq("tracked_item_id", itemId);
+        if (couponList.length) {
+          const rows = couponList.map(c => ({
+            user_id: auth.user.id,
+            tracked_item_id: itemId,
+            code: c.code,
+            description: c.description || null,
+            store: c.store || null,
+            expires_on: c.expires_on || null
+          }));
+          await auth.client.from("item_coupons").insert(rows);
+        }
+      } catch (error) {
+        // Silently no-op if the table doesn't exist yet (user hasn't run the SQL).
+        console.warn("saveItemCoupons skipped:", error.message);
+      }
+    }
+
+    // On Coupons-tab open, hydrate the in-memory list from any rows already
+    // saved for this user's tracked items. Items absent from the cache still
+    // get a live Groq lookup on the same pass.
+    async function loadCachedCoupons() {
+      if (!auth.user || !auth.client || !items.length) return;
+      try {
+        const itemIds = items.map(i => i.id).filter(Boolean);
+        if (!itemIds.length) return;
+        const { data, error } = await auth.client
+          .from("item_coupons")
+          .select("*")
+          .eq("user_id", auth.user.id)
+          .in("tracked_item_id", itemIds);
+        if (error || !data) return;
+        const byItem = new Map();
+        for (const row of data) {
+          const arr = byItem.get(row.tracked_item_id) || [];
+          arr.push(row);
+          byItem.set(row.tracked_item_id, arr);
+        }
+        for (const item of items) {
+          const rows = byItem.get(item.id);
+          if (!rows || !rows.length) continue;
+          couponsLoadedFor.add(String(item.id));
+          rows.forEach((row, i) => {
+            coupons.push({
+              code: row.code,
+              store: row.store || item.retailer || "Any store",
+              desc: row.description || "",
+              expiry: row.expires_on && row.expires_on !== "Unknown" ? `Expires ${row.expires_on}` : (row.expires_on || ""),
+              color: COUPON_COLORS[(coupons.length + i) % COUPON_COLORS.length],
+              itemName: item.name,
+              itemId: item.id
+            });
+          });
+        }
+      } catch (error) {
+        console.warn("loadCachedCoupons skipped:", error.message);
+      }
+    }
+
+    // Login wall: open the modal without the close button, ignore backdrop clicks.
+    function openAuthModalLocked(mode = "signin") {
+      auth.locked = true;
+      setAuthMode(mode);
+      els.authClose.hidden = true;
+      els.authError.textContent = "";
+      els.authBackdrop.classList.add("show");
+      els.authBackdrop.setAttribute("aria-hidden", "false");
+      setTimeout(() => els.authEmail.focus(), 50);
+    }
+
+    function closeAuthModalForced() {
+      auth.locked = false;
+      els.authBackdrop.classList.remove("show");
+      els.authBackdrop.setAttribute("aria-hidden", "true");
+      els.authForm.reset();
+      els.authError.textContent = "";
+    }
+
+    function setAuthMode(mode) {
+      auth.mode = mode;
+      els.authTabs.forEach(tab => {
+        const active = tab.dataset.authTab === mode;
+        tab.classList.toggle("is-active", active);
+        tab.setAttribute("aria-selected", String(active));
+      });
+      if (mode === "signup") {
+        els.authTitle.textContent = "Create your account";
+        els.authSubtitle.textContent = "Save your tracked items and pick up where you left off.";
+        els.authNameField.hidden = false;
+        els.authPassword.autocomplete = "new-password";
+        els.authSubmit.textContent = "Create account";
+      } else {
+        els.authTitle.textContent = "Sign in to Dealwise";
+        els.authSubtitle.textContent = "Sign in to save your tracked items across devices.";
+        els.authNameField.hidden = true;
+        els.authPassword.autocomplete = "current-password";
+        els.authSubmit.textContent = "Sign in";
+      }
+    }
+
+    // ---- Wire up auth UI events ----
+    els.settingsBtn.addEventListener("click", () => {
+      if (els.settingsMenu.hidden) openSettingsMenu(); else closeSettingsMenu();
+    });
+    document.addEventListener("click", event => {
+      if (els.settingsMenu.hidden) return;
+      if (!els.settingsWrap.contains(event.target)) closeSettingsMenu();
+    });
+    els.signOutBtn.addEventListener("click", async () => {
+      closeSettingsMenu();
+      if (!auth.client) return;
+      await auth.client.auth.signOut();
+    });
+    // The auth modal is a login wall: no close button, no click-outside-to-close.
+    els.authTabs.forEach(tab => tab.addEventListener("click", () => setAuthMode(tab.dataset.authTab)));
+
+    els.authForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!auth.client) {
+        els.authError.textContent = "Auth is not configured.";
+        return;
+      }
+      const email = els.authEmail.value.trim();
+      const password = els.authPassword.value;
+      els.authError.textContent = "";
+      els.authSubmit.disabled = true;
+      const originalLabel = els.authSubmit.textContent;
+      els.authSubmit.textContent = auth.mode === "signup" ? "Creating…" : "Signing in…";
+      try {
+        if (auth.mode === "signup") {
+          const name = els.authName.value.trim();
+          const { data, error } = await auth.client.auth.signUp({
+            email,
+            password,
+            options: { data: { display_name: name || email.split("@")[0] } }
+          });
+          if (error) throw error;
+          if (!data.session) {
+            els.authError.textContent = "Check your email to confirm your account, then sign in.";
+            setAuthMode("signin");
+          }
+        } else {
+          const { error } = await auth.client.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+        }
+      } catch (error) {
+        els.authError.textContent = error.message || "Something went wrong.";
+      } finally {
+        els.authSubmit.disabled = false;
+        els.authSubmit.textContent = originalLabel;
+      }
+    });
+
+    els.authGoogle.addEventListener("click", async () => {
+      if (!auth.client) return;
+      els.authError.textContent = "";
+      try {
+        await auth.client.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo: window.location.origin + window.location.pathname }
+        });
+      } catch (error) {
+        els.authError.textContent = error.message || "Google sign-in failed.";
+      }
+    });
+
+    // Expose hooks the rest of the app uses.
+    window.dealwiseAuth = { queueItemsSave, queueCreditsSave, saveItemCoupons, loadCachedCoupons, getUser: () => auth.user };
+
+    bootAuth();
+  </script>
+</body>
+</html>
