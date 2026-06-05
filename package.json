@@ -2,8 +2,5 @@
   "name": "dealwise",
   "version": "1.0.0",
   "private": true,
-  "description": "Dealwise — Groq-powered price tracker. Local dev: `node server.js`. Vercel deploys index.html + /api/.",
-  "engines": {
-    "node": ">=18"
-  }
+  "description": "Dealwise — Groq-powered price tracker."
 }

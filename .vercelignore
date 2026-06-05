@@ -1,6 +1,4 @@
-# Local dev entrypoint -- shipped to the deploy but unused by Vercel.
-# (Vercel sees /api/*.js functions and serves index.html + assets statically.)
-server.js
+# Files not needed in the deployed bundle.
 patch_html.js
 .env
 .env.*
